@@ -3,8 +3,6 @@
 const expect  = require('chai').expect;
 const newTask = require('../index');
 
-const newTask = require('./task');
-
 const do_x = (obj, mainTask) => {
     setTimeout(function() {
         obj.a = 1;
