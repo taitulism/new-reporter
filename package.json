@@ -1,0 +1,27 @@
+{
+  "name": "new-task",
+  "version": "0.0.1",
+  "description": "Create tasks and sub-tasks to help your async code.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/**/*.spec.js",
+    "lint": "eslint ./index.js ./lib"
+  },
+  "keywords": [
+    "async",
+    "task",
+    "subtask",
+    "sub task"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taitulism/newTask"
+  },
+  "author": "taitulism@gmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "3.5.0",
+    "eslint": "3.9.1",
+    "mocha": "3.1.2"
+  }
+}
