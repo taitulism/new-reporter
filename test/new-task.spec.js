@@ -3,17 +3,17 @@
 const expect  = require('chai').expect;
 const newTask = require('../index');
 
-const do_x = (obj, mainTask) => {
+function do_x (obj, mainTask) {
     setTimeout(function() {
         obj.a = 1;
         mainTask.reportDone(null, obj);
     }, 10);
-};
+}
 
-const do_y = (obj, mainTask) => {
+function do_y (obj, mainTask) {
     obj.files = [];
 
-    setTimeout(function() {
+    setTimeout(() => {
         const entries = ['file1', 'file2', 'file3'];
         const subTask = mainTask.newTask(entries.length);
 
@@ -22,14 +22,14 @@ const do_y = (obj, mainTask) => {
         });
 
     }, 5);
-};
+}
 
-const do_z = (subTask, obj, file) => {
+function do_z (subTask, obj, file) {
     setTimeout(() => {
         obj.files.push(file);
         subTask.reportDone(null, obj);
     }, 0)
-};
+}
 
 
 function fn(param, callback) {
@@ -53,7 +53,7 @@ fn('param', (err, obj) => {
 
 
 
-describe('newTask', () => {
+describe('newTask', (done) => {
     it('is a function', () => {
         expect(newTask).to.be.a.function;
     });
