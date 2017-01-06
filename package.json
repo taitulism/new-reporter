@@ -5,7 +5,7 @@
   "main": "new-task.js",
   "scripts": {
     "test": "mocha test/**/*.spec.js",
-    "lint": "eslint ./index.js ./lib"
+    "lint": "eslint ./new-task.js"
   },
   "keywords": [
     "async",

@@ -30,6 +30,8 @@ TaskProto.newTask = newTask;
 
 TaskProto.reportDone = function (...args) {
     this.done++;
+
+    // check if complete (all done)
     if (this.done === this.totalSubTasks) {
         this.callback(...args);
     }
