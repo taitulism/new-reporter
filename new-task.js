@@ -18,6 +18,11 @@ function newTask (len, callback) {
     return new Task(len, callback);
 }
 
+function isTask (obj) {
+    return obj instanceof Task;
+}
+
+/* CONSTRUCTOR */
 function Task (len, callback) {
     this.totalSubTasks = len;
     this.callback      = callback;
@@ -37,6 +42,3 @@ TaskProto.reportDone = function (...args) {
     }
 };
 
-function isTask (obj) {
-    return obj instanceof Task;
-}
