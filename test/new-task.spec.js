@@ -1,7 +1,7 @@
 'use strict';
 
 const expect  = require('chai').expect;
-const newTask = require('../index');
+const newTask = require('../new-task');
 
 function do_x (obj, mainTask) {
     setTimeout(function() {

@@ -2,7 +2,7 @@
   "name": "new-task",
   "version": "0.0.1",
   "description": "Create tasks and sub-tasks to help your async code.",
-  "main": "index.js",
+  "main": "new-task.js",
   "scripts": {
     "test": "mocha test/**/*.spec.js",
     "lint": "eslint ./index.js ./lib"

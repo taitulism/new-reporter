@@ -8,7 +8,7 @@ module.exports = newTask;
  │  const parentTask = this;
 */
 function newTask (len, callback) {
-    if (!callback && this.whois === '_TASK_') {
+    if (!callback && isTask(this)) {
         return new Task(len, (...args) => {
             // a subTask's end callback is its parentTask's .reportDone() method
             this.reportDone(...args);
@@ -26,18 +26,15 @@ function Task (len, callback) {
 
 const TaskProto = Task.prototype;
 
-TaskProto.whois = '_TASK_';
-
 TaskProto.newTask = newTask;
 
 TaskProto.reportDone = function (...args) {
-    this.checkDone(...args);
-};
-
-TaskProto.checkDone = function (...args) {
     this.done++;
-
     if (this.done === this.totalSubTasks) {
         this.callback(...args);
     }
 };
+
+function isTask (obj) {
+    return obj instanceof Task;
+}
