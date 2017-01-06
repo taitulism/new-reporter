@@ -42,16 +42,16 @@ function fn(param, callback) {
 }
 
 // ------------------------------------------
-console.log('wait 4 seconds...');
-fn('param', (err, obj) => {
-    console.log('--- gr8 sxs! ---');
-    console.log('err:', err);
-    console.log('return', obj);
-});
+// console.log('wait 4 seconds...');
+// fn('param', (err, obj) => {
+//     console.log('--- gr8 sxs! ---');
+//     console.log('err:', err);
+//     console.log('return', obj);
+// });
 
 
 
-
+const NO_ARGS_ERR = 'newTask needs at least one argument to run: nnewTask (len, callback)';
 
 describe('newTask', (done) => {
     it('is a function', () => {
@@ -59,9 +59,18 @@ describe('newTask', (done) => {
     });
 
     it('returns a Task instance', () => {
-        const x = newTask();
-        console.log(x);
-        expect(newTask).to.be.a.function;
+        const task = newTask(1);
+
+        expect(task).to.be.an.object;
+        expect(task.totalSubTasks).to.equal(1);
+        expect(task.callback).to.be.undefined;
+        expect(task.done).to.equal(0);
+        expect(task.newTask).to.be.a.function;
+        expect(task.reportDone).to.be.a.function;
+    });
+
+    it('throws an error when invoked with no arguments', () => {
+        expect(newTask).to.throw(NO_ARGS_ERR);
     });
 });
 
