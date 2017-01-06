@@ -3,14 +3,14 @@
 const expect  = require('chai').expect;
 const newTask = require('../new-task');
 
-function do_x (obj, mainTask) {
+function do_something (obj, mainTask) {
     setTimeout(function() {
         obj.a = 1;
         mainTask.reportDone(null, obj);
     }, 10);
 }
 
-function do_y (obj, mainTask) {
+function do_anotherThing (obj, mainTask) {
     obj.files = [];
 
     setTimeout(() => {
@@ -18,13 +18,13 @@ function do_y (obj, mainTask) {
         const subTask = mainTask.newTask(entries.length);
 
         entries.forEach((file) => {
-            do_z(subTask, obj, file);
+            do_stuff(subTask, obj, file);
         });
 
     }, 5);
 }
 
-function do_z (subTask, obj, file) {
+function do_stuff (subTask, obj, file) {
     setTimeout(() => {
         obj.files.push(file);
         subTask.reportDone(null, obj);
@@ -37,8 +37,8 @@ function fn(param, callback) {
 
     const mainTask = newTask(2, callback);
 
-    do_x(obj, mainTask);
-    do_y(obj, mainTask);
+    do_something(obj, mainTask);
+    do_anotherThing(obj, mainTask);
 }
 
 // ------------------------------------------
@@ -55,6 +55,12 @@ fn('param', (err, obj) => {
 
 describe('newTask', (done) => {
     it('is a function', () => {
+        expect(newTask).to.be.a.function;
+    });
+
+    it('returns a Task instance', () => {
+        const x = newTask();
+        console.log(x);
         expect(newTask).to.be.a.function;
     });
 });
