@@ -110,79 +110,69 @@ describe('Task instance', () => {
         });
         
         describe('actions', () => {
-            it('its runs its "callback" function when its "done" prop value reaches its "totalSubTasks" prop value', () => {
+            it('runs its "callback" function when its "done" prop value reaches its "totalSubTasks" prop value', () => {
                 const callbackSpy = sinon.spy()
                 const task = newTask(2, callbackSpy);
                 
                 task.reportDone();
+                expect(callbackSpy.notCalled).to.be.true;
                 task.reportDone();
-
                 expect(callbackSpy.calledOnce).to.be.true;
             });
+
+            it('works for async tasks', (done) => {
+                function callback () {
+                    expect(callbackSpy.calledOnce).to.be.true;
+                    done();
+                }
+
+                const callbackSpy = sinon.spy(callback);
+
+                const task = newTask(2, callbackSpy);
+
+                setTimeout(() => {
+                    task.reportDone();
+                }, 2);
+
+                setTimeout(() => {
+                    task.reportDone();
+                }, 1);
+            });
+
+            it('creates sub-tasks', () => {
+                const mainTask = newTask(2, noop);
+                const subTask1 = mainTask.newTask(1);
+                const subTask2 = mainTask.newTask(1);
+
+                expect(subTask1 instanceof NewTaskConstructor).to.be.true;
+                expect(subTask2 instanceof NewTaskConstructor).to.be.true;
+            });
+
+            it('is done when all of its subTasks are done', (done) => {
+                function callback () {
+                    expect(callbackSpy.calledOnce).to.be.true;
+                    done();
+                }
+
+                const callbackSpy = sinon.spy(callback);
+
+                const mainTask = newTask(1, callbackSpy);
+                const subTask1 = mainTask.newTask(1);
+                const subTask2 = mainTask.newTask(2);
+
+                setTimeout(() => {
+                    subTask1.reportDone();
+                }, 2);
+
+                const ary = ['a', 'b'];
+
+                ary.forEach(() => {
+                    setTimeout(() => {
+                        subTask2.reportDone();
+                    }, 2);
+                });
+            });
         });
-    });
-    
-    it('does nothing if its last .reportDone() doesn\'t gets called', () => {
-        const callbackSpy = sinon.spy();
-        const task = newTask(2, callbackSpy);
-
-        task.reportDone();
-
-        expect(task.totalSubTasks).to.equal(2);
-        expect(task.done).to.equal(1);
-        expect(callbackSpy.notCalled).to.be.true;
-    });
-
-    it('runs a callback when its last .reportDone() gets called', () => {
-        const callbackSpy = sinon.spy();
-        const task = newTask(2, callbackSpy);
-
-        task.reportDone();
-        expect(callbackSpy.notCalled).to.be.true;
-
-        task.reportDone();
-        expect(callbackSpy.calledOnce).to.be.true;
-    });
-
-    it('also works for async tasks', (done) => {
-        function callback () {
-            expect(callbackSpy.calledOnce).to.be.true;
-            done();
-        }
-
-        const callbackSpy = sinon.spy(callback);
-
-        const task = newTask(2, callbackSpy);
-
-        setTimeout(() => {
-            task.reportDone();
-        }, 2);
-
-        setTimeout(() => {
-            task.reportDone();
-        }, 1);
-    });
-
-    it('can create sub-tasks', () => {
-        const callbackSpy = sinon.spy();
-
-        const mainTask = newTask(1, callbackSpy);
-        const subTask1 = mainTask.newTask(1);
-        const subTask2 = mainTask.newTask(1);
-
-        expect(subTask1 instanceof NewTaskConstructor).to.be.true;
-        expect(subTask2 instanceof NewTaskConstructor).to.be.true;
-    });
-
-    it('is done when its subTasks are all done', () => {
-        const callbackSpy = sinon.spy();
-
-        const mainTask = newTask(1, callbackSpy);
-        const subTask = mainTask.newTask(1);
-
-        subTask.reportDone();
-
-        expect(callbackSpy.calledOnce).to.be.true;
     });
 });
 
