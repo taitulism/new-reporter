@@ -8,9 +8,6 @@ function noop () {}
 
 const NewTaskConstructor = newTask(1, noop).constructor;
 
-const NO_ARGS_ERR         = 'newTask needs at least one argument to run: nnewTask (len, callback)';
-const LEN_ISNT_NUMBER_ERR = 'newTask needs the first argument to be a number: newTask (<len:number>, <callback:Task/function>)';
-
 describe('newTask', () => {
     it('is a function', () => {
         expect(newTask).to.be.a.function;
@@ -30,7 +27,7 @@ describe('newTask', () => {
     });
 
     it('throws an error when invoked with no arguments', () => {
-        expect(newTask).to.throw(NO_ARGS_ERR);
+        expect(newTask).to.throw(TypeError);
     });
 });
 

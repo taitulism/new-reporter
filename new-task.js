@@ -23,17 +23,17 @@ const EXTRA_REPORTED_DONE          = 'A Task has reported "done" too many times.
 
 function validateLen (len) {
     if (!len) {
-        throw new Error(NO_ARGS_ERR);
+        throw new TypeError(NO_ARGS_ERR);
     }
 
     if (typeof len !== 'number') {
-        throw new Error(LEN_IS_NOT_NUMBER_ERR);
+        throw new TypeError(LEN_IS_NOT_NUMBER_ERR);
     }
 }
 
 function validateCallback (callback) {
     if (typeof callback !== 'function') {
-        throw new Error(CALLBACK_IS_NOT_FUNCTION_ERR);
+        throw new TypeError(CALLBACK_IS_NOT_FUNCTION_ERR);
     }
 }
 
@@ -73,7 +73,7 @@ TaskProto.reportDone = function (...args) {
         this.callback(...args);
     }
     else { // (done > total)
-        throw new Error(`${EXTRA_REPORTED_DONE}\ntotalSubTasks:${this.totalSubTasks}\ndone:${this.done}`);
+        throw new RangeError(`${EXTRA_REPORTED_DONE}\ntotalSubTasks:${this.totalSubTasks}\ndone:${this.done}`);
     }
 };
 
