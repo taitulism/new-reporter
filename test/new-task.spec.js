@@ -29,9 +29,99 @@ describe('newTask', () => {
     it('throws an error when invoked with no arguments', () => {
         expect(newTask).to.throw(ReferenceError);
     });
+
+    it('throws an error when invoked with a non-numeric "len" argument (first)', () => {
+        try {
+            newTask('not a number', noop);
+            expect(true).to.be.false;
+        } 
+        catch (err) {
+            expect(err).to.be.a.TypeError;
+        }
+    });
+
+    it('throws an error when invoked with a non-function "callback" argument (second)', () => {
+        try {
+            newTask(2, 'not a function');
+            expect(true).to.be.false;
+        } 
+        catch (err) {
+            expect(err).to.be.a.TypeError;
+        }
+    });
 });
 
 describe('newTask instance', () => {
+    
+    describe('newTask instance structure', () => {
+        const task = newTask(2, noop);
+
+        it('is an instance of Task constructor', () => {
+            expect(task instanceof NewTaskConstructor).to.be.true;
+        });
+
+        it('has a prop: "done" which is a number, starting at 0', () => {
+            expect(task.done).to.be.a.number;
+            expect(task.done).to.be.equal(0);
+        });
+
+        it('has a prop: "totalSubTasks" which is a number, passed as the first argument "len"', () => {
+            expect(task.totalSubTasks).to.be.a.number;
+            expect(task.totalSubTasks).to.be.equal(2);
+        });
+
+        it('has a prop: "callback" which is a function, passed as the second argument "callback"', () => {
+            expect(task.callback).to.be.a.function;
+            expect(task.callback).to.be.equal(noop);
+        });
+
+        it('has a method: "reportDone"', () => {
+            expect(task.reportDone).to.be.a.function;
+        });
+
+        it('has a method: "newTask', () => {
+            expect(task.newTask).to.be.a.function;
+        });
+    });
+
+    describe('newTask instance starting state', () => {
+        const task = newTask(2, noop);
+
+        it('its "done" prop starts at 0', () => {
+            expect(task.done).to.be.equal(0);
+        });
+
+        it('its "totalSubTasks" prop starts at "len", its first argument', () => {
+            expect(task.totalSubTasks).to.be.equal(2);
+        });
+    });
+
+    describe('newTask instance behavior', () => {
+        describe('newTask instance state changes', () => {
+            it('its "done" prop increments by 1 for every .reportDone() call', () => {
+                const task = newTask(2, noop);
+                
+                expect(task.done).to.be.equal(0);
+                task.reportDone();
+                expect(task.done).to.be.equal(1);
+                task.reportDone();
+                expect(task.done).to.be.equal(2);
+            });
+        });
+        
+        describe('newTask instance actions', () => {
+            it('its runs its "callback" function when its "done" prop vlue reaches its "totalSubTasks" prop value on a .reportDone() call', () => {
+                const callbackSpy = sinon.spy()
+                const task = newTask(2, callbackSpy);
+                
+                task.reportDone();
+                task.reportDone();
+
+                expect(callbackSpy.calledOnce).to.be.true;
+            });
+        });
+    });
+    
     it('does nothing if its last .reportDone() doesn\'t gets called', () => {
         const callbackSpy = sinon.spy();
         const task = newTask(2, callbackSpy);
