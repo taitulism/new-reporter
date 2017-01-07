@@ -29,70 +29,150 @@ describe('newTask', () => {
     it('throws an error when invoked with no arguments', () => {
         expect(newTask).to.throw(ReferenceError);
     });
+
+    it('throws an error when invoked with a non-numeric "len" argument (first)', () => {
+        try {
+            newTask('not a number', noop);
+            expect(true).to.be.false;
+        } 
+        catch (err) {
+            expect(err).to.be.a.TypeError;
+        }
+    });
+
+    it('throws an error when invoked with a non-function "callback" argument (second)', () => {
+        try {
+            newTask(2, 'not a function');
+            expect(true).to.be.false;
+        } 
+        catch (err) {
+            expect(err).to.be.a.TypeError;
+        }
+    });
 });
 
-describe('newTask instance', () => {
-    it('does nothing if its last .reportDone() doesn\'t gets called', () => {
-        const callbackSpy = sinon.spy();
-        const task = newTask(2, callbackSpy);
+describe('Task instance', () => {
+    
+    describe('structure', () => {
+        const task = newTask(2, noop);
 
-        task.reportDone();
+        it('is an instance of Task constructor', () => {
+            expect(task instanceof NewTaskConstructor).to.be.true;
+        });
 
-        expect(task.totalSubTasks).to.equal(2);
-        expect(task.done).to.equal(1);
-        expect(callbackSpy.notCalled).to.be.true;
+        it('has a prop: "done" which is a number, starting at 0', () => {
+            expect(task.done).to.be.a.number;
+            expect(task.done).to.be.equal(0);
+        });
+
+        it('has a prop: "totalSubTasks" which is a number, passed as the first argument "len"', () => {
+            expect(task.totalSubTasks).to.be.a.number;
+            expect(task.totalSubTasks).to.be.equal(2);
+        });
+
+        it('has a prop: "callback" which is a function, passed as the second argument "callback"', () => {
+            expect(task.callback).to.be.a.function;
+            expect(task.callback).to.be.equal(noop);
+        });
+
+        it('has a method: "reportDone"', () => {
+            expect(task.reportDone).to.be.a.function;
+        });
+
+        it('has a method: "newTask', () => {
+            expect(task.newTask).to.be.a.function;
+        });
     });
 
-    it('runs a callback when its last .reportDone() gets called', () => {
-        const callbackSpy = sinon.spy();
-        const task = newTask(2, callbackSpy);
+    describe('starting state', () => {
+        const task = newTask(2, noop);
 
-        task.reportDone();
-        expect(callbackSpy.notCalled).to.be.true;
+        it('its "done" prop starts at 0', () => {
+            expect(task.done).to.be.equal(0);
+        });
 
-        task.reportDone();
-        expect(callbackSpy.calledOnce).to.be.true;
+        it('its "totalSubTasks" prop starts at "len", its first argument', () => {
+            expect(task.totalSubTasks).to.be.equal(2);
+        });
     });
 
-    it('also works for async tasks', (done) => {
-        function callback () {
-            expect(callbackSpy.calledOnce).to.be.true;
-            done();
-        }
+    describe('behavior', () => {
+        describe('state changes', () => {
+            it('its "done" prop increments by 1 for every .reportDone() call', () => {
+                const task = newTask(2, noop);
+                
+                expect(task.done).to.be.equal(0);
+                task.reportDone();
+                expect(task.done).to.be.equal(1);
+                task.reportDone();
+                expect(task.done).to.be.equal(2);
+            });
+        });
+        
+        describe('actions', () => {
+            it('runs its "callback" function when its "done" prop value reaches its "totalSubTasks" prop value', () => {
+                const callbackSpy = sinon.spy()
+                const task = newTask(2, callbackSpy);
 
-        const callbackSpy = sinon.spy(callback);
+                task.reportDone();
+                expect(callbackSpy.notCalled).to.be.true;
+                task.reportDone();
+                expect(callbackSpy.calledOnce).to.be.true;
+            });
 
-        const task = newTask(2, callbackSpy);
+            it('works for async tasks', (done) => {
+                function callback () {
+                    expect(callbackSpy.calledOnce).to.be.true;
+                    done();
+                }
 
-        setTimeout(() => {
-            task.reportDone();
-        }, 2);
+                const callbackSpy = sinon.spy(callback);
 
-        setTimeout(() => {
-            task.reportDone();
-        }, 1);
-    });
+                const task = newTask(2, callbackSpy);
 
-    it('can create sub-tasks', () => {
-        const callbackSpy = sinon.spy();
+                setTimeout(() => {
+                    task.reportDone();
+                }, 2);
 
-        const mainTask = newTask(1, callbackSpy);
-        const subTask1 = mainTask.newTask(1);
-        const subTask2 = mainTask.newTask(1);
+                setTimeout(() => {
+                    task.reportDone();
+                }, 1);
+            });
 
-        expect(subTask1 instanceof NewTaskConstructor).to.be.true;
-        expect(subTask2 instanceof NewTaskConstructor).to.be.true;
-    });
+            it('creates sub-tasks', () => {
+                const mainTask = newTask(2, noop);
+                const subTask1 = mainTask.newTask(1);
+                const subTask2 = mainTask.newTask(1);
 
-    it('is done when its subTasks are all done', () => {
-        const callbackSpy = sinon.spy();
+                expect(subTask1 instanceof NewTaskConstructor).to.be.true;
+                expect(subTask2 instanceof NewTaskConstructor).to.be.true;
+            });
 
-        const mainTask = newTask(1, callbackSpy);
-        const subTask = mainTask.newTask(1);
+            it('is done when all of its subTasks are done', (done) => {
+                function callback () {
+                    expect(callbackSpy.calledOnce).to.be.true;
+                    done();
+                }
 
-        subTask.reportDone();
+                const callbackSpy = sinon.spy(callback);
 
-        expect(callbackSpy.calledOnce).to.be.true;
+                const mainTask = newTask(1, callbackSpy);
+                const subTask1 = mainTask.newTask(1);
+                const subTask2 = mainTask.newTask(2);
+
+                setTimeout(() => {
+                    subTask1.reportDone();
+                }, 2);
+
+                const ary = ['a', 'b'];
+
+                ary.forEach(() => {
+                    setTimeout(() => {
+                        subTask2.reportDone();
+                    }, 2);
+                });
+            });
+        });
     });
 });
 
