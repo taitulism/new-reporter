@@ -56,8 +56,8 @@ const TaskProto = Task.prototype;
 TaskProto.newTask = function (len) {
     validateLen(len);
 
-    const subTask = new Task(len, (...args) => {
-        this.reportDone(...args);
+    const subTask = new Task(len, () => {
+        this.reportDone();
     });
 
     subTask.data = this.data;
@@ -65,7 +65,7 @@ TaskProto.newTask = function (len) {
     return subTask;
 };
 
-TaskProto.reportDone = function (...args) {
+TaskProto.reportDone = function () {
     this.done++;
 
     const done  = this.done;
@@ -75,9 +75,11 @@ TaskProto.reportDone = function (...args) {
         return;
     }
     else if (done === total) {
-        this.callback(...args);
+        // console.log('complete');
+        this.callback(this.data);
     }
     else { // (done > total)
+        // console.log(`${EXTRA_REPORTED_DONE}\ntotalSubTasks:${this.totalSubTasks}\ndone:${this.done}`);
         throw new RangeError(`${EXTRA_REPORTED_DONE}\ntotalSubTasks:${this.totalSubTasks}\ndone:${this.done}`);
     }
 };

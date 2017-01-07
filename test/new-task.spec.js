@@ -99,6 +99,20 @@ describe('Task instance', () => {
     });
 
     describe('behavior', () => {
+        it('throws an error when .reportDone() is called more then "totalSubTasks"', () => {
+            const task = newTask(2, noop);
+
+            task.reportDone();
+            task.reportDone();
+
+            try {
+                task.reportDone();
+            }
+            catch (err) {
+                expect(err).to.be.a.RangeError;
+            }
+        });
+
         describe('state changes', () => {
             it('its "done" prop increments by 1 for every .reportDone() call', () => {
                 const task = newTask(2, noop);
@@ -152,13 +166,14 @@ describe('Task instance', () => {
 
             it('is done when all of its subTasks are done', (done) => {
                 function callback () {
+                    expect(subTask2.done).to.equal(2);
                     expect(callbackSpy.calledOnce).to.be.true;
                     done();
                 }
 
                 const callbackSpy = sinon.spy(callback);
 
-                const mainTask = newTask(1, callbackSpy);
+                const mainTask = newTask(2, callbackSpy);
                 const subTask1 = mainTask.newTask(1);
                 const subTask2 = mainTask.newTask(2);
 
@@ -176,22 +191,36 @@ describe('Task instance', () => {
             });
 
             it('its "data" prop is shared between tasks and their sub-tasks for the user to use', () => {
-                const mainTask = newTask(1, noop);
                 const MY_VALUE_1 = 'myValue1';
                 const MY_VALUE_2 = 'myValue2';
 
-                mainTask.data.myKey1 = MY_VALUE_1;
+                const mainTask = newTask(1, noop);
+                const subTask  = mainTask.newTask(1);
 
-                const subTask = mainTask.newTask(1);
-                
-                subTask.data.myKey2 = MY_VALUE_2;
+                mainTask.data.myKey1 = MY_VALUE_1;
+                subTask.data.myKey2  = MY_VALUE_2;
 
                 expect(mainTask.data).to.deep.equal({
                     myKey1: MY_VALUE_1,
                     myKey2: MY_VALUE_2,
                 });
-                
+
                 expect(mainTask.data).to.deep.equal(subTask.data);
+            });
+
+            it('run its callback with the data object as an argument', (done) => {
+                const dataObj = {key:'value'};
+
+                function callback (data) {
+                    expect(callbackSpy.calledWith(dataObj)).to.be.true;
+                    done();
+                }
+
+                const callbackSpy = sinon.spy(callback);
+                const mainTask = newTask(1, callbackSpy);
+
+                mainTask.data = dataObj;
+                mainTask.reportDone();
             });
 
         });
