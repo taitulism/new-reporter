@@ -110,7 +110,7 @@ describe('newTask instance', () => {
         });
         
         describe('actions', () => {
-            it('its runs its "callback" function when its "done" prop vlue reaches its "totalSubTasks" prop value on a .reportDone() call', () => {
+            it('its runs its "callback" function when its "done" prop value reaches its "totalSubTasks" prop value\non a .reportDone() call', () => {
                 const callbackSpy = sinon.spy()
                 const task = newTask(2, callbackSpy);
                 
