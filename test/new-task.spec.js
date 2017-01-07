@@ -97,7 +97,7 @@ describe('Task instance', () => {
     });
 
     describe('behavior', () => {
-        describe('newTask instance state changes', () => {
+        describe('state changes', () => {
             it('its "done" prop increments by 1 for every .reportDone() call', () => {
                 const task = newTask(2, noop);
                 
