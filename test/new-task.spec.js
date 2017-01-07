@@ -51,7 +51,7 @@ describe('newTask', () => {
     });
 });
 
-describe('newTask instance', () => {
+describe('Task instance', () => {
     
     describe('structure', () => {
         const task = newTask(2, noop);
@@ -110,7 +110,7 @@ describe('newTask instance', () => {
         });
         
         describe('actions', () => {
-            it('its runs its "callback" function when its "done" prop value reaches its "totalSubTasks" prop value\non a .reportDone() call', () => {
+            it('its runs its "callback" function when its "done" prop value reaches its "totalSubTasks" prop value', () => {
                 const callbackSpy = sinon.spy()
                 const task = newTask(2, callbackSpy);
                 
