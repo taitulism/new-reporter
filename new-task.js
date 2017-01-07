@@ -23,7 +23,7 @@ const EXTRA_REPORTED_DONE          = 'A Task has reported "done" too many times.
 
 function validateLen (len) {
     if (!len) {
-        throw new TypeError(NO_ARGS_ERR);
+        throw new ReferenceError(NO_ARGS_ERR);
     }
 
     if (typeof len !== 'number') {

@@ -27,7 +27,7 @@ describe('newTask', () => {
     });
 
     it('throws an error when invoked with no arguments', () => {
-        expect(newTask).to.throw(TypeError);
+        expect(newTask).to.throw(ReferenceError);
     });
 });
 
