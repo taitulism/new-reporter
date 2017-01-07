@@ -19,6 +19,7 @@ function newTask (len, callback) {
 const NO_ARGS_ERR                  = 'newTask needs at least one argument to run: nnewTask (len, callback)';
 const LEN_IS_NOT_NUMBER_ERR        = 'newTask first argument should be a number: newTask (<len:number>, <callback:Task/function>)';
 const CALLBACK_IS_NOT_FUNCTION_ERR = 'newTask second argument should be a function: newTask (<len:number>, <callback:Task/function>)';
+const EXTRA_REPORTED_DONE          = 'A Task has reported "done" too many times.';
 
 function validateLen (len) {
     if (!len) {
@@ -65,6 +66,9 @@ TaskProto.reportDone = function (...args) {
     // if complete - run callback
     if (this.done === this.totalSubTasks) {
         this.callback(...args);
+    }
+    else if (this.done > this.totalSubTasks) {
+        throw new Error(`${EXTRA_REPORTED_DONE}\ntotalSubTasks:${this.totalSubTasks}\ndone:${this.done}`);
     }
 };
 
