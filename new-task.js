@@ -56,9 +56,13 @@ const TaskProto = Task.prototype;
 TaskProto.newTask = function (len) {
     validateLen(len);
 
-    return new Task(len, (...args) => {
+    const subTask = new Task(len, (...args) => {
         this.reportDone(...args);
     });
+
+    subTask.data = this.data;
+
+    return subTask;
 };
 
 TaskProto.reportDone = function (...args) {

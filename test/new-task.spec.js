@@ -174,6 +174,26 @@ describe('Task instance', () => {
                     }, 2);
                 });
             });
+
+            it('its "data" prop is shared between tasks and their sub-tasks for the user to use', () => {
+                const mainTask = newTask(1, noop);
+                const MY_VALUE_1 = 'myValue1';
+                const MY_VALUE_2 = 'myValue2';
+
+                mainTask.data.myKey1 = MY_VALUE_1;
+
+                const subTask = mainTask.newTask(1);
+                
+                subTask.data.myKey2 = MY_VALUE_2;
+
+                expect(mainTask.data).to.deep.equal({
+                    myKey1: MY_VALUE_1,
+                    myKey2: MY_VALUE_2,
+                });
+                
+                expect(mainTask.data).to.deep.equal(subTask.data);
+            });
+
         });
     });
 });
