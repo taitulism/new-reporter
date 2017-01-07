@@ -3,44 +3,66 @@
 module.exports = newTask;
 
 /*
- │  "newTask" can run as a standalone function or as a Task's method.
- │  If it's a Task's method - "this" is the parent Task, 
- │  const parentTask = this;
+ │  "newTask" can run in two different contexts:
+ │  1. as a standalone function: newTask(len, callback)
+ │  2. as a Task's method:       task.newTask(len)
+ │
+ │  In case 2, the childTask's callback function will call the parentTask's reportDone method.
 */
 function newTask (len, callback) {
-    if (!len) {
-        throw new Error('newTask needs at least one argument to run: nnewTask (len, callback)');
-    }
-
-    if (!callback && isTask(this)) {
-        return new Task(len, (...args) => {
-            // a subTask's end callback is its parentTask's .reportDone() method
-            this.reportDone(...args);
-        });
-    }
+    validateLen(len);
+    validateCallback(callback);
 
     return new Task(len, callback);
 }
 
-function isTask (obj) {
-    return obj instanceof Task;
+const NO_ARGS_ERR                  = 'newTask needs at least one argument to run: nnewTask (len, callback)';
+const LEN_IS_NOT_NUMBER_ERR        = 'newTask first argument should be a number: newTask (<len:number>, <callback:Task/function>)';
+const CALLBACK_IS_NOT_FUNCTION_ERR = 'newTask second argument should be a function: newTask (<len:number>, <callback:Task/function>)';
+
+function validateLen (len) {
+    if (!len) {
+        throw new Error(NO_ARGS_ERR);
+    }
+
+    if (typeof len !== 'number') {
+        throw new Error(LEN_IS_NOT_NUMBER_ERR);
+    }
 }
 
-/* CONSTRUCTOR */
+function validateCallback (callback) {
+    if (typeof callback !== 'function') {
+        throw new Error(CALLBACK_IS_NOT_FUNCTION_ERR);
+    }
+}
+
+
+/* ------------- *
+    Constructor
+ * ------------- */
 function Task (len, callback) {
     this.totalSubTasks = len;
     this.callback      = callback;
     this.done          = 0;
 }
 
+/* ----------- *
+    Prototype
+ * ----------- */
 const TaskProto = Task.prototype;
 
-TaskProto.newTask = newTask;
+TaskProto.newTask = function (len) {
+    validateLen(len);
+
+    return new Task(len, (...args) => {
+        this.reportDone(...args);
+    });
+};
 
 TaskProto.reportDone = function (...args) {
     this.done++;
 
-    // check if complete (all done)
+    // if complete - run callback
     if (this.done === this.totalSubTasks) {
         this.callback(...args);
     }
