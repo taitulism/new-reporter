@@ -53,7 +53,7 @@ describe('newTask', () => {
 
 describe('newTask instance', () => {
     
-    describe('newTask instance structure', () => {
+    describe('structure', () => {
         const task = newTask(2, noop);
 
         it('is an instance of Task constructor', () => {
@@ -84,7 +84,7 @@ describe('newTask instance', () => {
         });
     });
 
-    describe('newTask instance starting state', () => {
+    describe('starting state', () => {
         const task = newTask(2, noop);
 
         it('its "done" prop starts at 0', () => {
@@ -96,7 +96,7 @@ describe('newTask instance', () => {
         });
     });
 
-    describe('newTask instance behavior', () => {
+    describe('behavior', () => {
         describe('newTask instance state changes', () => {
             it('its "done" prop increments by 1 for every .reportDone() call', () => {
                 const task = newTask(2, noop);
@@ -109,7 +109,7 @@ describe('newTask instance', () => {
             });
         });
         
-        describe('newTask instance actions', () => {
+        describe('actions', () => {
             it('its runs its "callback" function when its "done" prop vlue reaches its "totalSubTasks" prop value on a .reportDone() call', () => {
                 const callbackSpy = sinon.spy()
                 const task = newTask(2, callbackSpy);
