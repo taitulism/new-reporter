@@ -43,6 +43,7 @@ function validateCallback (callback) {
  * ------------- */
 function Task (len, callback) {
     this.done = 0;
+    this.data = {};
     this.totalSubTasks = len;
     this.callback = callback;
 }

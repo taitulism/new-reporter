@@ -17,13 +17,6 @@ describe('newTask', () => {
         const task = newTask(1, noop);
 
         expect(task instanceof NewTaskConstructor).to.be.true;
-
-        expect(task).to.be.an.object;
-        expect(task.totalSubTasks).to.equal(1);
-        expect(task.callback).to.equal(noop);
-        expect(task.done).to.equal(0);
-        expect(task.newTask).to.be.a.function;
-        expect(task.reportDone).to.be.a.function;
     });
 
     it('throws an error when invoked with no arguments', () => {
@@ -52,7 +45,6 @@ describe('newTask', () => {
 });
 
 describe('Task instance', () => {
-    
     describe('structure', () => {
         const task = newTask(2, noop);
 
@@ -60,19 +52,21 @@ describe('Task instance', () => {
             expect(task instanceof NewTaskConstructor).to.be.true;
         });
 
-        it('has a prop: "done" which is a number, starting at 0', () => {
+        it('has a prop: "done" which is a number', () => {
             expect(task.done).to.be.a.number;
-            expect(task.done).to.be.equal(0);
         });
 
-        it('has a prop: "totalSubTasks" which is a number, passed as the first argument "len"', () => {
+        it('has a prop: "totalSubTasks" which is a number', () => {
             expect(task.totalSubTasks).to.be.a.number;
-            expect(task.totalSubTasks).to.be.equal(2);
         });
 
         it('has a prop: "callback" which is a function, passed as the second argument "callback"', () => {
             expect(task.callback).to.be.a.function;
             expect(task.callback).to.be.equal(noop);
+        });
+
+        it('has a prop: "data" which is an object', () => {
+            expect(task.data).to.be.an.object;
         });
 
         it('has a method: "reportDone"', () => {
@@ -91,8 +85,16 @@ describe('Task instance', () => {
             expect(task.done).to.be.equal(0);
         });
 
-        it('its "totalSubTasks" prop starts at "len", its first argument', () => {
+        it('its "totalSubTasks" prop is passed as "len", its first argument', () => {
             expect(task.totalSubTasks).to.be.equal(2);
+        });
+
+        it('its "callback" prop is passed as its second argument', () => {
+            expect(task.callback).to.be.equal(noop);
+        });
+
+        it('its "data" prop starts as an empty object', () => {
+             expect(task.data).to.deep.equal({});
         });
     });
 
