@@ -109,68 +109,66 @@ describe('Task instance', () => {
             });
         });
         
-        describe('actions', () => {
-            it('runs its "callback" function when its "done" prop value reaches its "totalSubTasks" prop value', () => {
-                const callbackSpy = sinon.spy()
-                const task = newTask(2, callbackSpy);
-                
-                task.reportDone();
-                expect(callbackSpy.notCalled).to.be.true;
-                task.reportDone();
+        it('runs its "callback" function when its "done" prop value reaches its "totalSubTasks" prop value', () => {
+            const callbackSpy = sinon.spy()
+            const task = newTask(2, callbackSpy);
+
+            task.reportDone();
+            expect(callbackSpy.notCalled).to.be.true;
+            task.reportDone();
+            expect(callbackSpy.calledOnce).to.be.true;
+        });
+
+        it('works for async tasks', (done) => {
+            function callback () {
                 expect(callbackSpy.calledOnce).to.be.true;
-            });
+                done();
+            }
 
-            it('works for async tasks', (done) => {
-                function callback () {
-                    expect(callbackSpy.calledOnce).to.be.true;
-                    done();
-                }
+            const callbackSpy = sinon.spy(callback);
 
-                const callbackSpy = sinon.spy(callback);
+            const task = newTask(2, callbackSpy);
 
-                const task = newTask(2, callbackSpy);
+            setTimeout(() => {
+                task.reportDone();
+            }, 2);
 
+            setTimeout(() => {
+                task.reportDone();
+            }, 1);
+        });
+
+        it('creates sub-tasks', () => {
+            const mainTask = newTask(2, noop);
+            const subTask1 = mainTask.newTask(1);
+            const subTask2 = mainTask.newTask(1);
+
+            expect(subTask1 instanceof NewTaskConstructor).to.be.true;
+            expect(subTask2 instanceof NewTaskConstructor).to.be.true;
+        });
+
+        it('is done when all of its subTasks are done', (done) => {
+            function callback () {
+                expect(callbackSpy.calledOnce).to.be.true;
+                done();
+            }
+
+            const callbackSpy = sinon.spy(callback);
+
+            const mainTask = newTask(1, callbackSpy);
+            const subTask1 = mainTask.newTask(1);
+            const subTask2 = mainTask.newTask(2);
+
+            setTimeout(() => {
+                subTask1.reportDone();
+            }, 2);
+
+            const ary = ['a', 'b'];
+
+            ary.forEach(() => {
                 setTimeout(() => {
-                    task.reportDone();
+                    subTask2.reportDone();
                 }, 2);
-
-                setTimeout(() => {
-                    task.reportDone();
-                }, 1);
-            });
-
-            it('creates sub-tasks', () => {
-                const mainTask = newTask(2, noop);
-                const subTask1 = mainTask.newTask(1);
-                const subTask2 = mainTask.newTask(1);
-
-                expect(subTask1 instanceof NewTaskConstructor).to.be.true;
-                expect(subTask2 instanceof NewTaskConstructor).to.be.true;
-            });
-
-            it('is done when all of its subTasks are done', (done) => {
-                function callback () {
-                    expect(callbackSpy.calledOnce).to.be.true;
-                    done();
-                }
-
-                const callbackSpy = sinon.spy(callback);
-
-                const mainTask = newTask(1, callbackSpy);
-                const subTask1 = mainTask.newTask(1);
-                const subTask2 = mainTask.newTask(2);
-
-                setTimeout(() => {
-                    subTask1.reportDone();
-                }, 2);
-
-                const ary = ['a', 'b'];
-
-                ary.forEach(() => {
-                    setTimeout(() => {
-                        subTask2.reportDone();
-                    }, 2);
-                });
             });
         });
     });
