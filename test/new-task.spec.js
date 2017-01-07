@@ -4,7 +4,9 @@ const sinon   = require('sinon');
 const expect  = require('chai').expect;
 const newTask = require('../new-task');
 
-const NewTaskConstructor = newTask(1).constructor;
+function noop () {}
+
+const NewTaskConstructor = newTask(1, noop).constructor;
 
 const NO_ARGS_ERR         = 'newTask needs at least one argument to run: nnewTask (len, callback)';
 const LEN_ISNT_NUMBER_ERR = 'newTask needs the first argument to be a number: newTask (<len:number>, <callback:Task/function>)';
@@ -15,13 +17,13 @@ describe('newTask', () => {
     });
 
     it('returns a Task instance', () => {
-        const task = newTask(1);
+        const task = newTask(1, noop);
 
         expect(task instanceof NewTaskConstructor).to.be.true;
 
         expect(task).to.be.an.object;
         expect(task.totalSubTasks).to.equal(1);
-        expect(task.callback).to.be.undefined;
+        expect(task.callback).to.equal(noop);
         expect(task.done).to.equal(0);
         expect(task.newTask).to.be.a.function;
         expect(task.reportDone).to.be.a.function;

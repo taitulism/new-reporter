@@ -11,12 +11,14 @@ module.exports = newTask;
 */
 function newTask (len, callback) {
     validateLen(len);
+    validateCallback(callback);
 
     return new Task(len, callback);
 }
 
-const NO_ARGS_ERR         = 'newTask needs at least one argument to run: nnewTask (len, callback)';
-const LEN_ISNT_NUMBER_ERR = 'newTask first argument should be a number: newTask (<len:number>, <callback:Task/function>)';
+const NO_ARGS_ERR                  = 'newTask needs at least one argument to run: nnewTask (len, callback)';
+const LEN_IS_NOT_NUMBER_ERR        = 'newTask first argument should be a number: newTask (<len:number>, <callback:Task/function>)';
+const CALLBACK_IS_NOT_FUNCTION_ERR = 'newTask second argument should be a function: newTask (<len:number>, <callback:Task/function>)';
 
 function validateLen (len) {
     if (!len) {
@@ -24,7 +26,13 @@ function validateLen (len) {
     }
 
     if (typeof len !== 'number') {
-        throw new Error(LEN_ISNT_NUMBER_ERR);
+        throw new Error(LEN_IS_NOT_NUMBER_ERR);
+    }
+}
+
+function validateCallback (callback) {
+    if (typeof callback !== 'function') {
+        throw new Error(CALLBACK_IS_NOT_FUNCTION_ERR);
     }
 }
 
