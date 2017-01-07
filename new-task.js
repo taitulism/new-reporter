@@ -63,11 +63,16 @@ TaskProto.newTask = function (len) {
 TaskProto.reportDone = function (...args) {
     this.done++;
 
-    // if complete - run callback
-    if (this.done === this.totalSubTasks) {
+    const done  = this.done;
+    const total = this.totalSubTasks;
+
+    if (done < total) {
+        return;
+    }
+    else if (done === total) {
         this.callback(...args);
     }
-    else if (this.done > this.totalSubTasks) {
+    else { // (done > total)
         throw new Error(`${EXTRA_REPORTED_DONE}\ntotalSubTasks:${this.totalSubTasks}\ndone:${this.done}`);
     }
 };
