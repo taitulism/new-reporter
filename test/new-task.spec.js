@@ -4,6 +4,8 @@ const sinon   = require('sinon');
 const expect  = require('chai').expect;
 const newTask = require('../new-task');
 
+const NewTaskConstructor = newTask(1).constructor;
+
 function do_something (obj, mainTask) {
     setTimeout(function() {
         obj.a = 1;
@@ -61,6 +63,8 @@ describe('newTask', () => {
 
     it('returns a Task instance', () => {
         const task = newTask(1);
+
+        expect(task instanceof NewTaskConstructor).to.be.true;
 
         expect(task).to.be.an.object;
         expect(task.totalSubTasks).to.equal(1);
@@ -124,8 +128,8 @@ describe('newTask instance', () => {
         const subTask1 = mainTask.newTask(1);
         const subTask2 = mainTask.newTask(1);
 
-        const NewTaskConstructor = mainTask.constructor;
-
+        expect(subTask1 instanceof NewTaskConstructor).to.be.true;
+        expect(subTask2 instanceof NewTaskConstructor).to.be.true;
     });
 
     it('is done when its subTasks are all done', () => {
@@ -133,7 +137,6 @@ describe('newTask instance', () => {
 
         const mainTask = newTask(1, callbackSpy);
         const subTask = mainTask.newTask(1);
-
 
         subTask.reportDone();
 
