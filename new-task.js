@@ -8,6 +8,10 @@ module.exports = newTask;
  │  const parentTask = this;
 */
 function newTask (len, callback) {
+    if (!len) {
+        throw new Error('newTask needs at least one argument to run: nnewTask (len, callback)');
+    }
+
     if (!callback && isTask(this)) {
         return new Task(len, (...args) => {
             // a subTask's end callback is its parentTask's .reportDone() method
