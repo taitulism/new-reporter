@@ -41,9 +41,9 @@ function validateCallback (callback) {
     Constructor
  * ------------- */
 function Task (len, callback) {
+    this.done = 0;
     this.totalSubTasks = len;
-    this.callback      = callback;
-    this.done          = 0;
+    this.callback = callback;
 }
 
 /* ----------- *
