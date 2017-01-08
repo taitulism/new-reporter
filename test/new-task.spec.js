@@ -2,7 +2,7 @@
 
 const sinon   = require('sinon');
 const expect  = require('chai').expect;
-const newReporter = require('../new-task');
+const newReporter = require('../new-reporter');
 
 function noop () {}
 

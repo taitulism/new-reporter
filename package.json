@@ -1,13 +1,18 @@
 {
-  "name": "new-task",
+  "name": "new-reporter",
   "version": "0.0.1",
-  "description": "Create tasks and sub-tasks to help your async code.",
-  "main": "new-task.js",
+  "description": "A tightly-coupled, politically-incorrect, non-elegant alternative to EventEmitter/PubSub.  
+But Hey! It's easier to debug with.",
+  "main": "new-reporter.js",
   "scripts": {
     "test": "mocha test/**/*.spec.js",
-    "lint": "eslint ./new-task.js"
+    "lint": "eslint ./new-reporter.js"
   },
   "keywords": [
+    "reporter",
+    "newreporter",
+    "new reporter",
+    "sub reporter",
     "async",
     "task",
     "subtask",
@@ -15,7 +20,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/taitulism/newTask"
+    "url": "https://github.com/taitulism/newReporter"
   },
   "author": "taitulism@gmail.com",
   "license": "MIT",
