@@ -1,8 +1,7 @@
 {
   "name": "new-reporter",
   "version": "0.0.1",
-  "description": "A tightly-coupled, politically-incorrect, non-elegant alternative to EventEmitter/PubSub.  
-But Hey! It's easier to debug with.",
+  "description": "A tightly-coupled, politically-incorrect, non-elegant alternative to EventEmitter/PubSub. But Hey! It's easier to debug with.",
   "main": "new-reporter.js",
   "scripts": {
     "test": "mocha test/**/*.spec.js",
