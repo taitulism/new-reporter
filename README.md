@@ -5,8 +5,11 @@
 
 newReporter
 ===========
-A tightly-coupled, politically-incorrect, non-elegant alternative to EventEmitter/PubSub.  
+A politically-incorrect, alternative to EventEmitter/PubSub.  
 But Hey! It's easier to debug with.
+
+
+
 
 Why?
 ----
@@ -18,12 +21,6 @@ with anything else but your own code?
 
 What if the subscriber is only listening to one publisher and always expecting the same event name (with different data of course).
 Why bother with names? Why even "pubsubing" your whole object in the first place?
-
-I've always wondered about the Pub/Sub concept.  
-Don't the publisher wants to know who
-
-
-
 
 
 
@@ -51,6 +48,8 @@ mainReporter.taskDone(); // 1
 mainReporter.taskDone(); // 2
 mainReporter.taskDone(); // 3 --> runs callback
 ```
+
+
 
 
 Sub-Reporter
@@ -82,6 +81,7 @@ subSubReporter.taskDone(); // calls subReporter.taskDone() and eventually mainRe
 
 
 
+
 Reporter.data
 -------------
 The `data` prop is shared between a reporter and all of its sub-reporters and their sub-reporters. It starts as an empty object so you could load it with your own props:
@@ -100,6 +100,9 @@ subSubReporter.data.myKey = 'myValue';
 
 subSubReporter.taskDone();
 ```
+
+
+
 
 A "Real Life" Use Case
 ----------------------
