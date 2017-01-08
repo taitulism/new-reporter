@@ -4,30 +4,30 @@ module.exports = newTask;
 
 /*
  │  "newTask" can run in two different contexts:
- │  1. as a standalone function: newTask(len, callback)
- │  2. as a Task's method:       task.newTask(len)
+ │  1. as a standalone function: newTask(totalSubTasks, callback)
+ │  2. as a Task's method:       task.newTask(totalSubTasks)
  │
  │  In case 2, the childTask's callback function will call the parentTask's reportDone method.
 */
-function newTask (len, callback) {
-    validateLen(len);
+function newTask (totalSubTasks, callback) {
+    validateTotalSubTasks(totalSubTasks);
     validateCallback(callback);
 
-    return new Task(len, callback);
+    return new Task(totalSubTasks, callback);
 }
 
-const NO_ARGS_ERR                  = 'newTask needs at least one argument to run: nnewTask (len, callback)';
-const LEN_IS_NOT_NUMBER_ERR        = 'newTask first argument should be a number: newTask (<len:number>, <callback:Task/function>)';
-const CALLBACK_IS_NOT_FUNCTION_ERR = 'newTask second argument should be a function: newTask (<len:number>, <callback:Task/function>)';
-const EXTRA_REPORTED_DONE          = 'A Task has reported "done" too many times.';
+const NO_ARGS_ERR                     = 'newTask needs at least one argument to run: nnewTask (totalSubTasks, callback)';
+const TOTALSUBTASKS_IS_NOT_NUMBER_ERR = 'newTask first argument should be a number: newTask (<totalSubTasks:number>, <callback:Task/function>)';
+const CALLBACK_IS_NOT_FUNCTION_ERR    = 'newTask second argument should be a function: newTask (<totalSubTasks:number>, <callback:Task/function>)';
+const EXTRA_REPORTED_DONE             = 'A Task has reported "done" too many times.';
 
-function validateLen (len) {
-    if (!len) {
+function validateTotalSubTasks (totalSubTasks) {
+    if (!totalSubTasks) {
         throw new ReferenceError(NO_ARGS_ERR);
     }
 
-    if (typeof len !== 'number') {
-        throw new TypeError(LEN_IS_NOT_NUMBER_ERR);
+    if (typeof totalSubTasks !== 'number') {
+        throw new TypeError(TOTALSUBTASKS_IS_NOT_NUMBER_ERR);
     }
 }
 
@@ -41,9 +41,10 @@ function validateCallback (callback) {
 /* ------------- *
     Constructor
  * ------------- */
-function Task (len, callback) {
+function Task (totalSubTasks, callback) {
     this.done = 0;
-    this.totalSubTasks = len;
+    this.data = {};
+    this.totalSubTasks = totalSubTasks;
     this.callback = callback;
 }
 
@@ -52,15 +53,19 @@ function Task (len, callback) {
  * ----------- */
 const TaskProto = Task.prototype;
 
-TaskProto.newTask = function (len) {
-    validateLen(len);
+TaskProto.newTask = function (totalSubTasks) {
+    validateTotalSubTasks(totalSubTasks);
 
-    return new Task(len, (...args) => {
-        this.reportDone(...args);
+    const subTask = new Task(totalSubTasks, () => {
+        this.reportDone();
     });
+
+    subTask.data = this.data;
+
+    return subTask;
 };
 
-TaskProto.reportDone = function (...args) {
+TaskProto.reportDone = function () {
     this.done++;
 
     const done  = this.done;
@@ -70,7 +75,7 @@ TaskProto.reportDone = function (...args) {
         return;
     }
     else if (done === total) {
-        this.callback(...args);
+        this.callback(this.data);
     }
     else { // (done > total)
         throw new RangeError(`${EXTRA_REPORTED_DONE}\ntotalSubTasks:${this.totalSubTasks}\ndone:${this.done}`);

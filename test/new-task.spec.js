@@ -17,20 +17,13 @@ describe('newTask', () => {
         const task = newTask(1, noop);
 
         expect(task instanceof NewTaskConstructor).to.be.true;
-
-        expect(task).to.be.an.object;
-        expect(task.totalSubTasks).to.equal(1);
-        expect(task.callback).to.equal(noop);
-        expect(task.done).to.equal(0);
-        expect(task.newTask).to.be.a.function;
-        expect(task.reportDone).to.be.a.function;
     });
 
     it('throws an error when invoked with no arguments', () => {
         expect(newTask).to.throw(ReferenceError);
     });
 
-    it('throws an error when invoked with a non-numeric "len" argument (first)', () => {
+    it('throws an error when invoked with a non-numeric "totalSubTasks" argument (first)', () => {
         try {
             newTask('not a number', noop);
             expect(true).to.be.false;
@@ -52,7 +45,6 @@ describe('newTask', () => {
 });
 
 describe('Task instance', () => {
-    
     describe('structure', () => {
         const task = newTask(2, noop);
 
@@ -60,19 +52,20 @@ describe('Task instance', () => {
             expect(task instanceof NewTaskConstructor).to.be.true;
         });
 
-        it('has a prop: "done" which is a number, starting at 0', () => {
+        it('has a prop: "done" which is a number', () => {
             expect(task.done).to.be.a.number;
-            expect(task.done).to.be.equal(0);
         });
 
-        it('has a prop: "totalSubTasks" which is a number, passed as the first argument "len"', () => {
+        it('has a prop: "totalSubTasks" which is a number', () => {
             expect(task.totalSubTasks).to.be.a.number;
-            expect(task.totalSubTasks).to.be.equal(2);
         });
 
-        it('has a prop: "callback" which is a function, passed as the second argument "callback"', () => {
+        it('has a prop: "callback" which is a function', () => {
             expect(task.callback).to.be.a.function;
-            expect(task.callback).to.be.equal(noop);
+        });
+
+        it('has a prop: "data" which is an object', () => {
+            expect(task.data).to.be.an.object;
         });
 
         it('has a method: "reportDone"', () => {
@@ -91,12 +84,34 @@ describe('Task instance', () => {
             expect(task.done).to.be.equal(0);
         });
 
-        it('its "totalSubTasks" prop starts at "len", its first argument', () => {
+        it('its "totalSubTasks" prop is passed as its first argument', () => {
             expect(task.totalSubTasks).to.be.equal(2);
+        });
+
+        it('its "callback" prop is passed as its second argument', () => {
+            expect(task.callback).to.be.equal(noop);
+        });
+
+        it('its "data" prop starts as an empty object', () => {
+             expect(task.data).to.deep.equal({});
         });
     });
 
     describe('behavior', () => {
+        it('throws an error when .reportDone() is called more then "totalSubTasks"', () => {
+            const task = newTask(2, noop);
+
+            task.reportDone();
+            task.reportDone();
+
+            try {
+                task.reportDone();
+            }
+            catch (err) {
+                expect(err).to.be.a.RangeError;
+            }
+        });
+
         describe('state changes', () => {
             it('its "done" prop increments by 1 for every .reportDone() call', () => {
                 const task = newTask(2, noop);
@@ -115,8 +130,11 @@ describe('Task instance', () => {
                 const task = newTask(2, callbackSpy);
 
                 task.reportDone();
+                expect(task.done).to.equal(1);
                 expect(callbackSpy.notCalled).to.be.true;
+
                 task.reportDone();
+                expect(task.done).to.equal(2);
                 expect(callbackSpy.calledOnce).to.be.true;
             });
 
@@ -139,7 +157,7 @@ describe('Task instance', () => {
                 }, 1);
             });
 
-            it('creates sub-tasks', () => {
+            it('can creates sub-tasks', () => {
                 const mainTask = newTask(2, noop);
                 const subTask1 = mainTask.newTask(1);
                 const subTask2 = mainTask.newTask(1);
@@ -150,13 +168,14 @@ describe('Task instance', () => {
 
             it('is done when all of its subTasks are done', (done) => {
                 function callback () {
+                    expect(subTask2.done).to.equal(2);
                     expect(callbackSpy.calledOnce).to.be.true;
                     done();
                 }
 
                 const callbackSpy = sinon.spy(callback);
 
-                const mainTask = newTask(1, callbackSpy);
+                const mainTask = newTask(2, callbackSpy);
                 const subTask1 = mainTask.newTask(1);
                 const subTask2 = mainTask.newTask(2);
 
@@ -172,6 +191,40 @@ describe('Task instance', () => {
                     }, 2);
                 });
             });
+
+            it('its "data" prop is shared between tasks and their sub-tasks for the user to use', () => {
+                const MY_VALUE_1 = 'myValue1';
+                const MY_VALUE_2 = 'myValue2';
+
+                const mainTask = newTask(1, noop);
+                const subTask  = mainTask.newTask(1);
+
+                mainTask.data.myKey1 = MY_VALUE_1;
+                subTask.data.myKey2  = MY_VALUE_2;
+
+                expect(mainTask.data).to.deep.equal({
+                    myKey1: MY_VALUE_1,
+                    myKey2: MY_VALUE_2,
+                });
+
+                expect(mainTask.data).to.deep.equal(subTask.data);
+            });
+
+            it('run its callback with the data object as an argument', (done) => {
+                const dataObj = {key:'value'};
+
+                function callback (dataObj) {
+                    expect(callbackSpy.calledWith(dataObj)).to.be.true;
+                    done();
+                }
+
+                const callbackSpy = sinon.spy(callback);
+                const mainTask = newTask(1, callbackSpy);
+
+                mainTask.data = dataObj;
+                mainTask.reportDone();
+            });
+
         });
     });
 });
