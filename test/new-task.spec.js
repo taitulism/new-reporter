@@ -6,7 +6,7 @@ const newTask = require('../new-task');
 
 function noop () {}
 
-const NewTaskConstructor = newTask(1, noop).constructor;
+const NewTaskConstructor = newTask(noop).constructor;
 
 describe('newTask', () => {
     it('is a function', () => {
@@ -14,7 +14,7 @@ describe('newTask', () => {
     });
 
     it('returns a Task instance', () => {
-        const task = newTask(1, noop);
+        const task = newTask(noop);
 
         expect(task instanceof NewTaskConstructor).to.be.true;
     });
@@ -88,6 +88,12 @@ describe('Task instance', () => {
             expect(task.totalSubTasks).to.be.equal(2);
         });
 
+        it('its "totalSubTasks" prop is 1 by default', () => {
+            const task1 = newTask(noop);
+
+            expect(task1.totalSubTasks).to.be.equal(1);
+        });
+
         it('its "callback" prop is passed as its second argument', () => {
             expect(task.callback).to.be.equal(noop);
         });
@@ -159,8 +165,10 @@ describe('Task instance', () => {
 
             it('can creates sub-tasks', () => {
                 const mainTask = newTask(2, noop);
-                const subTask1 = mainTask.newTask(1);
-                const subTask2 = mainTask.newTask(1);
+                const subTask1 = mainTask.newTask();
+                const subTask2 = mainTask.newTask();
+
+                expect(subTask1.totalSubTasks).to.equal(1);
 
                 expect(subTask1 instanceof NewTaskConstructor).to.be.true;
                 expect(subTask2 instanceof NewTaskConstructor).to.be.true;
@@ -196,8 +204,8 @@ describe('Task instance', () => {
                 const MY_VALUE_1 = 'myValue1';
                 const MY_VALUE_2 = 'myValue2';
 
-                const mainTask = newTask(1, noop);
-                const subTask  = mainTask.newTask(1);
+                const mainTask = newTask(noop);
+                const subTask  = mainTask.newTask();
 
                 mainTask.data.myKey1 = MY_VALUE_1;
                 subTask.data.myKey2  = MY_VALUE_2;
@@ -219,7 +227,7 @@ describe('Task instance', () => {
                 }
 
                 const callbackSpy = sinon.spy(callback);
-                const mainTask = newTask(1, callbackSpy);
+                const mainTask = newTask(callbackSpy);
 
                 mainTask.data = dataObj;
                 mainTask.reportDone();

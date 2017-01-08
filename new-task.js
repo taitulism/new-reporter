@@ -10,6 +10,11 @@ module.exports = newTask;
  │  In case 2, the childTask's callback function will call the parentTask's reportDone method.
 */
 function newTask (totalSubTasks, callback) {
+    if (typeof totalSubTasks === 'function' && !callback) {
+        callback = totalSubTasks;
+        totalSubTasks = 1;
+    }
+
     validateTotalSubTasks(totalSubTasks);
     validateCallback(callback);
 
@@ -53,7 +58,7 @@ function Task (totalSubTasks, callback) {
  * ----------- */
 const TaskProto = Task.prototype;
 
-TaskProto.newTask = function (totalSubTasks) {
+TaskProto.newTask = function (totalSubTasks = 1) {
     validateTotalSubTasks(totalSubTasks);
 
     const subTask = new Task(totalSubTasks, () => {
