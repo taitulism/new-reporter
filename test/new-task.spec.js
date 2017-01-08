@@ -23,7 +23,7 @@ describe('newTask', () => {
         expect(newTask).to.throw(ReferenceError);
     });
 
-    it('throws an error when invoked with a non-numeric "len" argument (first)', () => {
+    it('throws an error when invoked with a non-numeric "totalSubTasks" argument (first)', () => {
         try {
             newTask('not a number', noop);
             expect(true).to.be.false;
@@ -60,9 +60,8 @@ describe('Task instance', () => {
             expect(task.totalSubTasks).to.be.a.number;
         });
 
-        it('has a prop: "callback" which is a function, passed as the second argument "callback"', () => {
+        it('has a prop: "callback" which is a function', () => {
             expect(task.callback).to.be.a.function;
-            expect(task.callback).to.be.equal(noop);
         });
 
         it('has a prop: "data" which is an object', () => {
@@ -85,7 +84,7 @@ describe('Task instance', () => {
             expect(task.done).to.be.equal(0);
         });
 
-        it('its "totalSubTasks" prop is passed as "len", its first argument', () => {
+        it('its "totalSubTasks" prop is passed as its first argument', () => {
             expect(task.totalSubTasks).to.be.equal(2);
         });
 
@@ -131,8 +130,11 @@ describe('Task instance', () => {
                 const task = newTask(2, callbackSpy);
 
                 task.reportDone();
+                expect(task.done).to.equal(1);
                 expect(callbackSpy.notCalled).to.be.true;
+
                 task.reportDone();
+                expect(task.done).to.equal(2);
                 expect(callbackSpy.calledOnce).to.be.true;
             });
 
@@ -155,7 +157,7 @@ describe('Task instance', () => {
                 }, 1);
             });
 
-            it('creates sub-tasks', () => {
+            it('can creates sub-tasks', () => {
                 const mainTask = newTask(2, noop);
                 const subTask1 = mainTask.newTask(1);
                 const subTask2 = mainTask.newTask(1);
@@ -211,7 +213,7 @@ describe('Task instance', () => {
             it('run its callback with the data object as an argument', (done) => {
                 const dataObj = {key:'value'};
 
-                function callback (data) {
+                function callback (dataObj) {
                     expect(callbackSpy.calledWith(dataObj)).to.be.true;
                     done();
                 }
