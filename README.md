@@ -5,8 +5,7 @@
 
 newReporter
 ===========
-A politically-incorrect, alternative to EventEmitter/PubSub.  
-But Hey! It's easier to debug with.
+A politically-incorrect alternative to orchestrate callback hell.
 
 
 
