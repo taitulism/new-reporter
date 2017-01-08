@@ -1,38 +1,38 @@
 'use strict';
 
-module.exports = newTask;
+module.exports = newReporter;
 
 /*
- │  "newTask" can run in two different contexts:
- │  1. as a standalone function: newTask(totalSubTasks, callback)
- │  2. as a Task's method:       task.newTask(totalSubTasks)
+ │  "newReporter" can run in two different contexts:
+ │  1. as a standalone function: newReporter(tasks, callback)
+ │  2. as a Reporter's method:       task.newReporter(tasks)
  │
- │  In case 2, the childTask's callback function will call the parentTask's reportDone method.
+ │  In case 2, the childReporter's callback function will call the parentReporter's taskDone method.
 */
-function newTask (totalSubTasks, callback) {
-    if (typeof totalSubTasks === 'function' && !callback) {
-        callback = totalSubTasks;
-        totalSubTasks = 1;
+function newReporter (tasks, callback) {
+    if (typeof tasks === 'function' && !callback) {
+        callback = tasks;
+        tasks = 1;
     }
 
-    validateTotalSubTasks(totalSubTasks);
+    validateTotalTasks(tasks);
     validateCallback(callback);
 
-    return new Task(totalSubTasks, callback);
+    return new Reporter(tasks, callback);
 }
 
-const NO_ARGS_ERR                     = 'newTask needs at least one argument to run: nnewTask (totalSubTasks, callback)';
-const TOTALSUBTASKS_IS_NOT_NUMBER_ERR = 'newTask first argument should be a number: newTask (<totalSubTasks:number>, <callback:Task/function>)';
-const CALLBACK_IS_NOT_FUNCTION_ERR    = 'newTask second argument should be a function: newTask (<totalSubTasks:number>, <callback:Task/function>)';
-const EXTRA_REPORTED_DONE             = 'A Task has reported "done" too many times.';
+const NO_ARGS_ERR                  = 'newReporter needs at least one argument to run: newReporter (tasks, callback)';
+const EXTRA_REPORTED_DONE          = 'A Reporter has reported "done" too many times.';
+const TASKS_IS_NOT_NUMBER_ERR      = 'newReporter first argument should be a number: newReporter (<tasks:number>, <callback:Task/function>)';
+const CALLBACK_IS_NOT_FUNCTION_ERR = 'newReporter second argument should be a function: newReporter (<tasks:number>, <callback:Task/function>)';
 
-function validateTotalSubTasks (totalSubTasks) {
-    if (!totalSubTasks) {
+function validateTotalTasks (tasks) {
+    if (!tasks) {
         throw new ReferenceError(NO_ARGS_ERR);
     }
 
-    if (typeof totalSubTasks !== 'number') {
-        throw new TypeError(TOTALSUBTASKS_IS_NOT_NUMBER_ERR);
+    if (typeof tasks !== 'number') {
+        throw new TypeError(TASKS_IS_NOT_NUMBER_ERR);
     }
 }
 
@@ -46,35 +46,35 @@ function validateCallback (callback) {
 /* ------------- *
     Constructor
  * ------------- */
-function Task (totalSubTasks, callback) {
+function Reporter (tasks, callback) {
     this.done = 0;
     this.data = {};
-    this.totalSubTasks = totalSubTasks;
-    this.callback = callback;
+    this.totalTasks = tasks;
+    this.callback   = callback;
 }
 
 /* ----------- *
     Prototype
  * ----------- */
-const TaskProto = Task.prototype;
+const ReporterProto = Reporter.prototype;
 
-TaskProto.newTask = function (totalSubTasks = 1) {
-    validateTotalSubTasks(totalSubTasks);
+ReporterProto.newReporter = function (tasks = 1) {
+    validateTotalTasks(tasks);
 
-    const subTask = new Task(totalSubTasks, () => {
-        this.reportDone();
+    const subReporter = new Reporter(tasks, () => {
+        this.taskDone();
     });
 
-    subTask.data = this.data;
+    subReporter.data = this.data;
 
-    return subTask;
+    return subReporter;
 };
 
-TaskProto.reportDone = function () {
+ReporterProto.taskDone = function () {
     this.done++;
 
     const done  = this.done;
-    const total = this.totalSubTasks;
+    const total = this.totalTasks;
 
     if (done < total) {
         return;
@@ -83,7 +83,7 @@ TaskProto.reportDone = function () {
         this.callback(this.data);
     }
     else { // (done > total)
-        throw new RangeError(`${EXTRA_REPORTED_DONE}\ntotalSubTasks:${this.totalSubTasks}\ndone:${this.done}`);
+        throw new RangeError(`${EXTRA_REPORTED_DONE}\ntotal tasks:${this.totalTasks}\ndone:${this.done}`);
     }
 };
 
