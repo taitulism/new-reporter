@@ -15,7 +15,7 @@ Usage
 ```js
 const newTask = require('newTask');
 
-const mainTask = newTask(totalTasks, callback});
+const mainTask = newTask(totalTasks, callback}); // "totalTasks" default is: 1
 ```
 
 A task will run its callback function when it has been reported done with `.reportDone()` as many times as its given limit (`totalTasks`):
