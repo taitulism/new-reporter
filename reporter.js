@@ -1,22 +1,10 @@
 'use strict';
 
-module.exports = newReporter;
-
-function newReporter (totalTasks, callback) {
-    if (typeof totalTasks === 'function' && !callback) {
-        callback = totalTasks;
-        totalTasks = 1;
-    }
-
-    validateTotalTasks(totalTasks);
-    validateCallback(callback);
-
-    return new Reporter(totalTasks, callback);
-}
+module.exports = Reporter;
 
 const NO_ARGS_ERR                  = 'newReporter needs at least one argument to run: newReporter (totalTasks, callback)';
 const EXTRA_REPORTED_DONE_ERR      = 'A Reporter has reported "done" too many times.';
-const TOTALTASKS_IS_NOT_NUMBER_ERR      = 'newReporter first argument should be a number: newReporter (<totalTasks:number>, <callback:Task/function>)';
+const TOTALTASKS_IS_NOT_NUMBER_ERR = 'newReporter first argument should be a number: newReporter (<totalTasks:number>, <callback:Task/function>)';
 const CALLBACK_IS_NOT_FUNCTION_ERR = 'newReporter second argument should be a function: newReporter (<totalTasks:number>, <callback:Task/function>)';
 
 function validateTotalTasks (totalTasks) {
@@ -40,6 +28,14 @@ function validateCallback (callback) {
     Constructor
  * ------------- */
 function Reporter (totalTasks, callback) {
+    if (typeof totalTasks === 'function' && !callback) {
+        callback = totalTasks;
+        totalTasks = 1;
+    }
+
+    validateTotalTasks(totalTasks);
+    validateCallback(callback);
+
     this.done = 0;
     this.data = {};
     this.totalTasks = totalTasks;

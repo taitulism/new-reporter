@@ -3,30 +3,30 @@
 const sinon   = require('sinon');
 const expect  = require('chai').expect;
 
-const newReporter = require('../reporter');
+const Reporter = require('../reporter');
 
 function noop () {}
 
-const ReporterConstructor = newReporter(noop).constructor;
+const ReporterConstructor = new Reporter(noop).constructor;
 
-describe('newReporter', () => {
+describe('new-reporter', () => {
     it('is a function', () => {
-        expect(newReporter).to.be.a.function;
+        expect(Reporter).to.be.a.function;
     });
 
     it('returns a Reporter instance', () => {
-        const reporter = newReporter(noop);
+        const reporter = new Reporter(noop);
 
         expect(reporter instanceof ReporterConstructor).to.be.true;
     });
 
     it('throws an error when invoked with no arguments', () => {
-        expect(newReporter).to.throw(ReferenceError);
+        expect(Reporter).to.throw(ReferenceError);
     });
 
     it('throws an error when invoked with a non-numeric nor a function "totalTasks" argument (first)', () => {
         try {
-            newReporter('not a number', noop);
+            new Reporter('not a number', noop);
             expect(true).to.be.false;
         } 
         catch (err) {
@@ -36,7 +36,7 @@ describe('newReporter', () => {
 
     it('throws an error when invoked with a non-function "callback" argument (second)', () => {
         try {
-            newReporter(2, 'not a function');
+            new Reporter(2, 'not a function');
             expect(true).to.be.false;
         } 
         catch (err) {
@@ -47,7 +47,7 @@ describe('newReporter', () => {
 
 describe('Reporter instance', () => {
     describe('structure', () => {
-        const reporter = newReporter(2, noop);
+        const reporter = new Reporter(2, noop);
 
         it('is an instance of Reporter constructor', () => {
             expect(reporter instanceof ReporterConstructor).to.be.true;
@@ -79,7 +79,7 @@ describe('Reporter instance', () => {
     });
 
     describe('starting state', () => {
-        const reporter = newReporter(2, noop);
+        const reporter = new Reporter(2, noop);
 
         it('its "done" prop starts at 0', () => {
             expect(reporter.done).to.be.equal(0);
@@ -90,7 +90,7 @@ describe('Reporter instance', () => {
         });
 
         it('its "totalTasks" prop is 1 by default', () => {
-            const reporter1 = newReporter(noop);
+            const reporter1 = new Reporter(noop);
 
             expect(reporter1.totalTasks).to.be.equal(1);
         });
@@ -106,7 +106,7 @@ describe('Reporter instance', () => {
 
     describe('behavior', () => {
         it('throws an error when .taskDone() is called more then "totalreporters"', () => {
-            const reporter = newReporter(2, noop);
+            const reporter = new Reporter(2, noop);
 
             reporter.taskDone();
             reporter.taskDone();
@@ -121,7 +121,7 @@ describe('Reporter instance', () => {
 
         describe('state changes', () => {
             it('its "done" prop increments by 1 for every .taskDone() call', () => {
-                const reporter = newReporter(2, noop);
+                const reporter = new Reporter(2, noop);
                 
                 expect(reporter.done).to.be.equal(0);
                 reporter.taskDone();
@@ -133,8 +133,8 @@ describe('Reporter instance', () => {
         
         describe('actions', () => {
             it('runs its "callback" function when its "done" prop value reaches its "totalTasks" prop value', () => {
-                const callbackSpy = sinon.spy()
-                const reporter = newReporter(2, callbackSpy);
+                const callbackSpy = sinon.spy();
+                const reporter = new Reporter(2, callbackSpy);
 
                 reporter.taskDone();
                 expect(reporter.done).to.equal(1);
@@ -153,7 +153,7 @@ describe('Reporter instance', () => {
 
                 const callbackSpy = sinon.spy(callback);
 
-                const reporter = newReporter(2, callbackSpy);
+                const reporter = new Reporter(2, callbackSpy);
 
                 setTimeout(() => {
                     reporter.taskDone();
@@ -165,7 +165,7 @@ describe('Reporter instance', () => {
             });
 
             it('can creates sub-reporters', () => {
-                const mainReporter = newReporter(2, noop);
+                const mainReporter = new Reporter(2, noop);
                 const subReporter1 = mainReporter.subReporter();
                 const subReporter2 = mainReporter.subReporter();
 
@@ -184,7 +184,7 @@ describe('Reporter instance', () => {
 
                 const callbackSpy = sinon.spy(callback);
 
-                const mainReporter = newReporter(2, callbackSpy);
+                const mainReporter = new Reporter(2, callbackSpy);
                 const subReporter1 = mainReporter.subReporter(1);
                 const subReporter2 = mainReporter.subReporter(2);
 
@@ -205,7 +205,7 @@ describe('Reporter instance', () => {
                 const MY_VALUE_1 = 'myValue1';
                 const MY_VALUE_2 = 'myValue2';
 
-                const mainReporter = newReporter(noop);
+                const mainReporter = new Reporter(noop);
                 const subReporter  = mainReporter.subReporter();
 
                 mainReporter.data.myKey1 = MY_VALUE_1;
@@ -222,13 +222,13 @@ describe('Reporter instance', () => {
             it('run its callback with the data object as an argument', (done) => {
                 const dataObj = {key:'value'};
 
-                function callback (dataObj) {
-                    expect(callbackSpy.calledWith(dataObj)).to.be.true;
+                function callback (data) {
+                    expect(callbackSpy.calledWith(data)).to.be.true;
                     done();
                 }
 
                 const callbackSpy = sinon.spy(callback);
-                const mainReporter = newReporter(callbackSpy);
+                const mainReporter = new Reporter(callbackSpy);
 
                 mainReporter.data = dataObj;
                 mainReporter.taskDone();
