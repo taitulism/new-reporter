@@ -10,20 +10,6 @@ A politically-incorrect alternative to orchestrate callback hell.
 
 
 
-Why?
-----
-The EventEmitter/PubSub way of wiring different code parts is a very abstract and considered as a best-practice.  
-It's the right thing to do, right? You want your modules to be pure, standalone and decoupled from anything else.  
-
-But what if all you need is gluing up some pieces of code that are already coupled conceptually and will never interact
-with anything else but your own code?
-
-What if the subscriber is only listening to one publisher and always expecting the same event name (with different data of course).
-Why bother with names? Why even "pubsubing" your whole object in the first place?
-
-
-
-
 Usage
 -----
 ###Basic:
@@ -53,7 +39,7 @@ mainReporter.taskDone(); // 3 --> runs callback
 
 Sub-Reporter
 ------------
-A Reporter can have sub-reporter:
+A Reporter can have sub-reporters:
 ```js
 const mainReporter = newReporter(3, callback});
 const subReporter1 = mainReporter.newReporter(1);
@@ -61,19 +47,17 @@ const subReporter2 = mainReporter.newReporter(1);
 const subReporter3 = mainReporter.newReporter(1);
 ```
 
-When a sub-reporter is done, it calls its parent's `.taskDone()` method.
+When a sub-reporter is done, it calls its parent's `.taskDone()` method so it doesn't need a callback:
 ```js
 const newReporter = require('newReporter');
 
 function callback (data) {
-  console.log(data); // --> {myKey:'myValue'}
+  console.log('all done');
 }
 
-const mainReporter   = newReporter(1, callback});
-const subReporter    = mainReporter.newReporter(1);
-const subSubReporter = subReporter.newReporter(1);
-
-subSubReporter.data.myKey = 'myValue';
+const mainReporter   = newReporter(callback});
+const subReporter    = mainReporter.newReporter();
+const subSubReporter = subReporter.newReporter();
 
 subSubReporter.taskDone(); // calls subReporter.taskDone() and eventually mainReporter.taskDone()
 ```
@@ -83,7 +67,8 @@ subSubReporter.taskDone(); // calls subReporter.taskDone() and eventually mainRe
 
 Reporter.data
 -------------
-The `data` prop is shared between a reporter and all of its sub-reporters and their sub-reporters. It starts as an empty object so you could load it with your own props:
+The `data` prop is shared between a reporter and all of its sub-reporters and their sub-reporters. 
+It starts as an empty object so you could load it with your own props:
 ```js
 const newReporter = require('newReporter');
 
