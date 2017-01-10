@@ -2,7 +2,7 @@
   "name": "new-reporter",
   "version": "0.0.1",
   "description": "A politically-incorrect alternative to orchestrate callback hell.",
-  "main": "reporter.js",
+  "main": "index.js",
   "scripts": {
     "test": "mocha test/**/*.spec.js",
     "lint": "eslint ./new-reporter.js"

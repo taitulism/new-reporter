@@ -3,7 +3,7 @@
 const sinon   = require('sinon');
 const expect  = require('chai').expect;
 
-const Reporter = require('../reporter');
+const Reporter = require('../');
 
 function noop () {}
 
