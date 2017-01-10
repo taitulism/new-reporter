@@ -2,13 +2,6 @@
 
 module.exports = newReporter;
 
-/*
- │  "newReporter" can run in two different contexts:
- │  1. as a standalone function: newReporter(tasks, callback)
- │  2. as a Reporter's method:       task.newReporter(tasks)
- │
- │  In case 2, the childReporter's callback function will call the parentReporter's taskDone method.
-*/
 function newReporter (tasks, callback) {
     if (typeof tasks === 'function' && !callback) {
         callback = tasks;
@@ -22,7 +15,7 @@ function newReporter (tasks, callback) {
 }
 
 const NO_ARGS_ERR                  = 'newReporter needs at least one argument to run: newReporter (tasks, callback)';
-const EXTRA_REPORTED_DONE          = 'A Reporter has reported "done" too many times.';
+const EXTRA_REPORTED_DONE_ERR      = 'A Reporter has reported "done" too many times.';
 const TASKS_IS_NOT_NUMBER_ERR      = 'newReporter first argument should be a number: newReporter (<tasks:number>, <callback:Task/function>)';
 const CALLBACK_IS_NOT_FUNCTION_ERR = 'newReporter second argument should be a function: newReporter (<tasks:number>, <callback:Task/function>)';
 
@@ -58,7 +51,7 @@ function Reporter (tasks, callback) {
  * ----------- */
 const ReporterProto = Reporter.prototype;
 
-ReporterProto.newReporter = function (tasks = 1) {
+ReporterProto.subReporter = function (tasks = 1) {
     validateTotalTasks(tasks);
 
     const subReporter = new Reporter(tasks, () => {
@@ -83,7 +76,6 @@ ReporterProto.taskDone = function () {
         this.callback(this.data);
     }
     else { // (done > total)
-        throw new RangeError(`${EXTRA_REPORTED_DONE}\ntotal tasks:${this.totalTasks}\ndone:${this.done}`);
+        throw new RangeError(`${EXTRA_REPORTED_DONE_ERR}\nTotal Tasks:${this.totalTasks}\nDone:${this.done}`);
     }
 };
-

@@ -2,6 +2,7 @@
 
 const sinon   = require('sinon');
 const expect  = require('chai').expect;
+
 const newReporter = require('../reporter');
 
 function noop () {}
@@ -72,8 +73,8 @@ describe('Reporter instance', () => {
             expect(reporter.taskDone).to.be.a.function;
         });
 
-        it('has a method: "newReporter', () => {
-            expect(reporter.newReporter).to.be.a.function;
+        it('has a method: "subReporter"', () => {
+            expect(reporter.subReporter).to.be.a.function;
         });
     });
 
@@ -165,8 +166,8 @@ describe('Reporter instance', () => {
 
             it('can creates sub-reporters', () => {
                 const mainReporter = newReporter(2, noop);
-                const subReporter1 = mainReporter.newReporter();
-                const subReporter2 = mainReporter.newReporter();
+                const subReporter1 = mainReporter.subReporter();
+                const subReporter2 = mainReporter.subReporter();
 
                 expect(subReporter1.totalTasks).to.equal(1);
 
@@ -174,7 +175,7 @@ describe('Reporter instance', () => {
                 expect(subReporter2 instanceof ReporterConstructor).to.be.true;
             });
 
-            it('is done when all of its subreporters are done', (done) => {
+            it('is done when all of its sub-reporters are done', (done) => {
                 function callback () {
                     expect(subReporter2.done).to.equal(2);
                     expect(callbackSpy.calledOnce).to.be.true;
@@ -184,8 +185,8 @@ describe('Reporter instance', () => {
                 const callbackSpy = sinon.spy(callback);
 
                 const mainReporter = newReporter(2, callbackSpy);
-                const subReporter1 = mainReporter.newReporter(1);
-                const subReporter2 = mainReporter.newReporter(2);
+                const subReporter1 = mainReporter.subReporter(1);
+                const subReporter2 = mainReporter.subReporter(2);
 
                 setTimeout(() => {
                     subReporter1.taskDone();
@@ -205,7 +206,7 @@ describe('Reporter instance', () => {
                 const MY_VALUE_2 = 'myValue2';
 
                 const mainReporter = newReporter(noop);
-                const subReporter  = mainReporter.newReporter();
+                const subReporter  = mainReporter.subReporter();
 
                 mainReporter.data.myKey1 = MY_VALUE_1;
                 subReporter.data.myKey2  = MY_VALUE_2;
@@ -236,51 +237,3 @@ describe('Reporter instance', () => {
         });
     });
 });
-
-/*
-    function do_something (obj, mainTask) {
-        setTimeout(function() {
-            obj.a = 1;
-            mainTask.taskDone(null, obj);
-        }, 10);
-    }
-
-    function do_anotherThing (obj, mainTask) {
-        obj.files = [];
-
-        setTimeout(() => {
-            const entries = ['file1', 'file2', 'file3'];
-            const subTask = mainTask.newReporter(entries.length);
-
-            entries.forEach((file) => {
-                do_stuff(subTask, obj, file);
-            });
-
-        }, 5);
-    }
-
-    function do_stuff (subTask, obj, file) {
-        setTimeout(() => {
-            obj.files.push(file);
-            subTask.taskDone(null, obj);
-        }, 0)
-    }
-
-
-    function fn(param, callback) {
-        const obj = {};
-
-        const mainTask = newReporter(2, callback);
-
-        do_something(obj, mainTask);
-        do_anotherThing(obj, mainTask);
-    }
-
-    // ------------------------------------------
-    // console.log('wait 4 seconds...');
-    // fn('param', (err, obj) => {
-    //     console.log('--- gr8 sxs! ---');
-    //     console.log('err:', err);
-    //     console.log('return', obj);
-    // });
-*/
