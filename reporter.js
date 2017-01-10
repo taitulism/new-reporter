@@ -2,30 +2,30 @@
 
 module.exports = newReporter;
 
-function newReporter (tasks, callback) {
-    if (typeof tasks === 'function' && !callback) {
-        callback = tasks;
-        tasks = 1;
+function newReporter (totalTasks, callback) {
+    if (typeof totalTasks === 'function' && !callback) {
+        callback = totalTasks;
+        totalTasks = 1;
     }
 
-    validateTotalTasks(tasks);
+    validateTotalTasks(totalTasks);
     validateCallback(callback);
 
-    return new Reporter(tasks, callback);
+    return new Reporter(totalTasks, callback);
 }
 
-const NO_ARGS_ERR                  = 'newReporter needs at least one argument to run: newReporter (tasks, callback)';
+const NO_ARGS_ERR                  = 'newReporter needs at least one argument to run: newReporter (totalTasks, callback)';
 const EXTRA_REPORTED_DONE_ERR      = 'A Reporter has reported "done" too many times.';
-const TASKS_IS_NOT_NUMBER_ERR      = 'newReporter first argument should be a number: newReporter (<tasks:number>, <callback:Task/function>)';
-const CALLBACK_IS_NOT_FUNCTION_ERR = 'newReporter second argument should be a function: newReporter (<tasks:number>, <callback:Task/function>)';
+const TOTALTASKS_IS_NOT_NUMBER_ERR      = 'newReporter first argument should be a number: newReporter (<totalTasks:number>, <callback:Task/function>)';
+const CALLBACK_IS_NOT_FUNCTION_ERR = 'newReporter second argument should be a function: newReporter (<totalTasks:number>, <callback:Task/function>)';
 
-function validateTotalTasks (tasks) {
-    if (!tasks) {
+function validateTotalTasks (totalTasks) {
+    if (!totalTasks) {
         throw new ReferenceError(NO_ARGS_ERR);
     }
 
-    if (typeof tasks !== 'number') {
-        throw new TypeError(TASKS_IS_NOT_NUMBER_ERR);
+    if (typeof totalTasks !== 'number') {
+        throw new TypeError(TOTALTASKS_IS_NOT_NUMBER_ERR);
     }
 }
 
@@ -39,10 +39,10 @@ function validateCallback (callback) {
 /* ------------- *
     Constructor
  * ------------- */
-function Reporter (tasks, callback) {
+function Reporter (totalTasks, callback) {
     this.done = 0;
     this.data = {};
-    this.totalTasks = tasks;
+    this.totalTasks = totalTasks;
     this.callback   = callback;
 }
 
@@ -51,10 +51,10 @@ function Reporter (tasks, callback) {
  * ----------- */
 const ReporterProto = Reporter.prototype;
 
-ReporterProto.subReporter = function (tasks = 1) {
-    validateTotalTasks(tasks);
+ReporterProto.subReporter = function (totalTasks = 1) {
+    validateTotalTasks(totalTasks);
 
-    const subReporter = new Reporter(tasks, () => {
+    const subReporter = new Reporter(totalTasks, () => {
         this.taskDone();
     });
 
