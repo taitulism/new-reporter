@@ -14,20 +14,20 @@ Usage
 -----
 ###Basic:
 ```js
-const newReporter = require('new-reporter');
+const Reporter = require('new-reporter');
 
-const mainReporter = newReporter(totalTasks, callback}); // "totalTasks" default is: 1
+const mainReporter = new Reporter(totalTasks, callback}); // "totalTasks" default is: 1
 ```
 
 A reporter will run its callback function when it has been reported done with `.taskDone()` as many times as its given limit (`totalTasks`):
 ```js
-const newReporter = require('new-reporter');
+const new Reporter = require('new-reporter');
 
 function callback (data) {
   console.log('all done');
 }
 
-const mainReporter = newReporter(3, callback});
+const mainReporter = new Reporter(3, callback});
 
 mainReporter.taskDone(); // 1
 mainReporter.taskDone(); // 2
@@ -41,7 +41,7 @@ Sub-Reporter
 ------------
 A Reporter can have sub-reporters:
 ```js
-const mainReporter = newReporter(3, callback});
+const mainReporter = new Reporter(3, callback});
 const subReporter1 = mainReporter.subReporter(1);
 const subReporter2 = mainReporter.subReporter(1);
 const subReporter3 = mainReporter.subReporter(1);
@@ -49,13 +49,13 @@ const subReporter3 = mainReporter.subReporter(1);
 
 When a sub-reporter is done, it calls its parent's `.taskDone()` method so it doesn't need a callback:
 ```js
-const newReporter = require('new-reporter');
+const Reporter = require('new-reporter');
 
 function callback (data) {
   console.log('all done');
 }
 
-const mainReporter   = newReporter(callback});
+const mainReporter   = new Reporter(callback});
 const subReporter    = mainReporter.subReporter();
 const subSubReporter = subReporter.subReporter();
 
@@ -70,13 +70,13 @@ Reporter.data
 The `data` prop is shared between a reporter and all of its sub-reporters and their sub-reporters.  
 It starts as an empty object so you could load it with your own props:
 ```js
-const newReporter = require('new-reporter');
+const Reporter = require('new-reporter');
 
 function callback (data) {
   console.log(data); // --> {myKey:'myValue'}
 }
 
-const mainReporter   = newReporter(1, callback});
+const mainReporter   = new Reporter(1, callback});
 const subReporter    = mainReporter.subReporter(1);
 const subSubReporter = subReporter.subReporter(1);
 
@@ -92,7 +92,7 @@ A "Real Life" Use Case
 ----------------------
 The callback gets called after an ajax request and reading all files in a certain folder:
 ```js
-const newReporter = require('new-reporter');
+const Reporter = require('new-reporter');
 
 function fetchData (mainReporter) {
   const requestUrl = mainReporter.data.url;
@@ -138,7 +138,7 @@ function callback (data) {
 
 
 function getAllData () {
-    const mainReporter = newReporter(2, callback);
+    const mainReporter = new Reporter(2, callback);
 
     mainReporter.data = {
         url: '/url',
