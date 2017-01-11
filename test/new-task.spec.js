@@ -21,7 +21,12 @@ describe('new-reporter', () => {
     });
 
     it('throws an error when invoked with no arguments', () => {
-        expect(Reporter).to.throw(ReferenceError);
+        try {
+            const reporter = new Reporter();
+        } 
+        catch (err) {
+            expect(err).to.be.a.ReferenceError;
+        }
     });
 
     it('throws an error when invoked with a non-numeric nor a function "totalTasks" argument (first)', () => {
