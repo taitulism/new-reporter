@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha test/**/*.spec.js",
-    "lint": "eslint ./new-reporter.js"
+    "lint": "eslint ./index.js ./lib"
   },
   "keywords": [
     "reporter",
