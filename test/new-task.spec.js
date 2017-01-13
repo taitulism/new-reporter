@@ -7,110 +7,129 @@ const Reporter = require('../');
 
 function noop () {}
 
-const ReporterConstructor = new Reporter(noop).constructor;
+const rootReporter = new Reporter(noop);
+const ReporterConstructor = rootReporter.constructor;
 
-describe('new-reporter', () => {
+describe('new-reporter class', () => {
     it('is a function', () => {
         expect(Reporter).to.be.a.function;
     });
 
-    it('returns a Reporter instance', () => {
-        const reporter = new Reporter(noop);
-
-        expect(reporter instanceof ReporterConstructor).to.be.true;
-    });
-
     it('throws an error when invoked with no arguments', () => {
         try {
-            const reporter = new Reporter();
+            new Reporter();
         } 
         catch (err) {
             expect(err).to.be.a.ReferenceError;
         }
     });
 
-    it('throws an error when invoked with a non-numeric nor a function "totalTasks" argument (first)', () => {
+    it('throws an error when invoked with a non-function "callback" argument', () => {
         try {
-            new Reporter('not a number', noop);
-            expect(true).to.be.false;
+            new Reporter('name');
+        } 
+        catch (err) {
+            expect(err).to.be.a.TypeError;
+        }
+        
+        try {
+            new Reporter('name', 2);
+        } 
+        catch (err) {
+            expect(err).to.be.a.TypeError;
+        }
+        
+        try {
+            new Reporter('name', 2, 'not a function');
         } 
         catch (err) {
             expect(err).to.be.a.TypeError;
         }
     });
 
-    it('throws an error when invoked with a non-function "callback" argument (second)', () => {
+    it('throws an error when invoked with a NaN "totalTasks" argument', () => {
         try {
-            new Reporter(2, 'not a function');
-            expect(true).to.be.false;
+            new Reporter('name', 'NaN', noop);
         } 
         catch (err) {
             expect(err).to.be.a.TypeError;
         }
+    });
+
+    it('returns a Reporter instance', () => {
+        expect((new Reporter(noop)) instanceof ReporterConstructor).to.be.true;
     });
 });
 
-describe('Reporter instance', () => {
-    describe('structure', () => {
+describe('Reporter Instance', () => {
+    it('is an instance of Reporter constructor', () => {
+        expect(rootReporter instanceof ReporterConstructor).to.be.true;
+    });
+
+    describe('props', () => {
+        const reporter = new Reporter(2, noop);
+        
+        describe('.name', () => {
+            it('is an optional argument', () => {
+                expect(reporter.name).to.equal('reporter_1');
+            });
+            it('is a string', () => {
+                expect(reporter.name).to.be.a.string;
+            });
+        });
+        
+        describe('.totalTasks', () => {
+            it('is a number', () => {
+                expect(reporter.totalTasks).to.be.a.number;
+            });
+            it('an optional argument', () => {
+                expect(rootReporter.totalTasks).to.be.a.number;
+            });
+            it('its default value is 1', () => {
+                expect(rootReporter.totalTasks).to.equal(1);
+            });
+        });
+
+        describe('.callback', () => {
+            it('is a function', () => {
+                expect(reporter.callback).to.be.a.function;
+            });
+            it('passed as an argument', () => {
+                expect(reporter.callback).to.equal(noop);
+            });
+        });
+
+        describe('.data', () => {
+            it('is an empty object', () => {
+                expect(reporter.data).to.be.an.object;
+                expect(reporter.data).to.deep.equal({});
+            });            
+        });
+
+        describe('.done', () => {
+            it('is a number', () => {
+                expect(reporter.done).to.be.a.number;
+            });
+            it('starts at 0', () => {
+                expect(reporter.done).to.equal(0);
+            });
+        });
+    });
+
+    describe('methods', () => {
         const reporter = new Reporter(2, noop);
 
-        it('is an instance of Reporter constructor', () => {
-            expect(reporter instanceof ReporterConstructor).to.be.true;
-        });
-
-        it('has a prop: "done" which is a number', () => {
-            expect(reporter.done).to.be.a.number;
-        });
-
-        it('has a prop: "totalTasks" which is a number', () => {
-            expect(reporter.totalTasks).to.be.a.number;
-        });
-
-        it('has a prop: "callback" which is a function', () => {
-            expect(reporter.callback).to.be.a.function;
-        });
-
-        it('has a prop: "data" which is an object', () => {
-            expect(reporter.data).to.be.an.object;
-        });
-
-        it('has a method: "taskDone"', () => {
+        it('.taskDone()', () => {
             expect(reporter.taskDone).to.be.a.function;
         });
 
-        it('has a method: "subReporter"', () => {
+        it('.subReporter()', () => {
             expect(reporter.subReporter).to.be.a.function;
-        });
-    });
-
-    describe('starting state', () => {
-        const reporter = new Reporter(2, noop);
-
-        it('its "done" prop starts at 0', () => {
-            expect(reporter.done).to.be.equal(0);
-        });
-
-        it('its "totalTasks" prop is passed as its first argument', () => {
-            expect(reporter.totalTasks).to.be.equal(2);
-        });
-
-        it('its "totalTasks" prop is 1 by default', () => {
-            const reporter1 = new Reporter(noop);
-
-            expect(reporter1.totalTasks).to.be.equal(1);
-        });
-
-        it('its "callback" prop is passed as its second argument', () => {
-            expect(reporter.callback).to.be.equal(noop);
-        });
-
-        it('its "data" prop starts as an empty object', () => {
-             expect(reporter.data).to.deep.equal({});
-        });
+        });            
     });
 
     describe('behavior', () => {
-        it('throws an error when .taskDone() is called more then "totalreporters"', () => {
+        it('throws an error when .taskDone() is called more then its ".totalTasks"', () => {
             const reporter = new Reporter(2, noop);
 
             reporter.taskDone();
