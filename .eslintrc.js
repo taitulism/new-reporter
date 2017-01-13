@@ -132,7 +132,6 @@ module.exports = {
         "semi": "error",
         "semi-spacing": "error",
         "sort-imports": "error",
-        "sort-vars": "error",
         "space-infix-ops": "error",
         "space-unary-ops": "error",
         "symbol-description": "error",
@@ -214,6 +213,7 @@ module.exports = {
             "error",
             "never"
         ],
+        "sort-vars": "off",
         "no-use-before-define": "off",
         "no-warning-comments": "off",
         "quote-props": "off",

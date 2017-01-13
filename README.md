@@ -5,29 +5,68 @@
 
 new-reporter
 ============
-A politically-incorrect alternative to orchestrate callback hell.
+A politically-incorrect alternative to orchestrate callback hell.  
+But hey! Its easier to debug!
 
 
 
 
 Usage
 -----
-###Basic:
 ```js
-const Reporter = require('new-reporter');
+const newReporter = require('new-reporter');
 
-const mainReporter = new Reporter(totalTasks, callback}); // "totalTasks" default is: 1
+const reporter = newReporter(reporterName, totalTasks, callback); // "totalTasks" default is: 1
 ```
 
-A reporter will run its callback function when it has been reported done with `.taskDone()` as many times as its given limit (`totalTasks`):
+Arguments
+---------
+* **reporterName** - String, optional.  
+Default value = `'reporter_i'` ("i" is an incrementing number)  
+Give a reporter a name (e.g. `'main-reporter'`).  
+Good for debugging.
+
+* **totalTasks** - Number, optional.  
+Default value = `1`  
+How many tasks should this reporter expects to be done before calling the `callback`?
+
+* **callback** - Function, required.  
+A function to run when all of the reporter's tasks reported done.  
+This function gets called with the reporter's `data` object.
+
+
+
+
+API
+---
+* **.taskDone()**  
+Call this method N times to make the reporter run its `callback` function, where "N" is the 
+reporter's `totalTasks`.
+This function gets no arguments.
+
+* **.subReporter(name, totalTasks)**  
+Returns a sub-reporter that when it's done, will run the current reporter's `.taskDone()` method.  
+Use a sub-reporter when a task can be splitted into sub-tasks.  
+For example: Your main reporter is expecting 2 tasks to be done: one is a simple task but the second
+needs to do two things (two sub-tasks). In this case, create a sub-reporter for the second task. Call `mainReporter.taskDone()` 
+when the simple task is done, and call `subReporter.taskDone()` twice, one for each of the second task's
+sub-tasks.
+
+
+
+
+Examples
+--------
+A reporter will run its callback function when it has been reported done with `.taskDone()` as many times as 
+its given limit (`totalTasks`):
 ```js
-const new Reporter = require('new-reporter');
+const newReporter = require('new-reporter');
 
 function callback (data) {
   console.log('all done');
 }
 
-const mainReporter = new Reporter(3, callback});
+const mainReporter = newReporter(3, callback});
 
 mainReporter.taskDone(); // 1
 mainReporter.taskDone(); // 2
@@ -41,25 +80,28 @@ Sub-Reporter
 ------------
 A Reporter can have sub-reporters:
 ```js
-const mainReporter = new Reporter(3, callback});
-const subReporter1 = mainReporter.subReporter(1);
+const mainReporter = newReporter(3, callback);
+const subReporter1 = mainReporter.subReporter(1); 
 const subReporter2 = mainReporter.subReporter(1);
 const subReporter3 = mainReporter.subReporter(1);
 ```
 
-When a sub-reporter is done, it calls its parent's `.taskDone()` method so it doesn't need a callback:
+***NOTE 1**: `totalTasks`'s default value is 1*   
+***NOTE 2**: Creating a sub-reporter for only one job is a redundant overhead.* 
+
+A a sub-reporter doesn't need a callback because when it's done it calls its parent's `.taskDone()` method:
 ```js
-const Reporter = require('new-reporter');
+const newReporter = require('new-reporter');
 
 function callback (data) {
   console.log('all done');
 }
 
-const mainReporter   = new Reporter(callback});
-const subReporter    = mainReporter.subReporter();
-const subSubReporter = subReporter.subReporter();
+const mainReporter = newReporter(callback);
+const subReporter = mainReporter.subReporter();
+const grandSubReporter = subReporter.subReporter();
 
-subSubReporter.taskDone(); // calls subReporter.taskDone() and eventually mainReporter.taskDone()
+grandSubReporter.taskDone(); // calls subReporter.taskDone() and eventually mainReporter.taskDone()
 ```
 
 
@@ -70,19 +112,21 @@ Reporter.data
 The `data` prop is shared between a reporter and all of its sub-reporters and their sub-reporters.  
 It starts as an empty object so you could load it with your own props:
 ```js
-const Reporter = require('new-reporter');
+const newReporter = require('new-reporter');
 
 function callback (data) {
   console.log(data); // --> {myKey:'myValue'}
 }
 
-const mainReporter   = new Reporter(1, callback});
-const subReporter    = mainReporter.subReporter(1);
-const subSubReporter = subReporter.subReporter(1);
+const mainReporter     = newReporter(callback});
+const subReporter      = mainReporter.subReporter();
+const grandSubReporter = subReporter.subReporter();
 
-subSubReporter.data.myKey = 'myValue';
+grandSubReporter.data.myKey = 'myValue';
 
-subSubReporter.taskDone();
+mainReporter.data.myKey === 'myValue' // true
+
+grandSubReporter.taskDone();
 ```
 
 
@@ -92,7 +136,7 @@ A "Real Life" Use Case
 ----------------------
 The callback gets called after an ajax request and reading all files in a certain folder:
 ```js
-const Reporter = require('new-reporter');
+const newReporter = require('new-reporter');
 
 function fetchData (mainReporter) {
   const requestUrl = mainReporter.data.url;
@@ -126,19 +170,11 @@ function readFileContent (file, subReporter) {
 
 function callback (data) {
   console.log(data);
-  /*
-    {
-      url: '/url',
-      folder: '/path/to/folder',
-      response: {...},
-      contents: [...]
-    }
-  */
 }
 
 
 function getAllData () {
-    const mainReporter = new Reporter(2, callback);
+    const mainReporter = newReporter(2, callback);
 
     mainReporter.data = {
         url: '/url',
@@ -150,5 +186,15 @@ function getAllData () {
 }
 
 getAllData();
+
+/*
+  callback's data: 
+  {
+    url: '/url',
+    folder: '/path/to/folder',
+    response: {...},
+    contents: [...]
+  }
+*/
 ```
 
