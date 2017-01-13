@@ -15,7 +15,7 @@ describe('new-reporter class', () => {
         expect(Reporter).to.be.a.function;
     });
 
-    it('throws an error when invoked with no arguments', () => {
+    it('throws a ReferenceError when invoked with no arguments', () => {
         try {
             new Reporter();
         } 
@@ -24,7 +24,7 @@ describe('new-reporter class', () => {
         }
     });
 
-    it('throws an error when invoked with a non-function "callback" argument', () => {
+    it('throws a TypeError when invoked with a non-function `callback` argument', () => {
         try {
             new Reporter('name');
         } 
@@ -47,7 +47,7 @@ describe('new-reporter class', () => {
         }
     });
 
-    it('throws an error when invoked with a NaN "totalTasks" argument', () => {
+    it('throws a TypeError when invoked with a NaN `totalTasks` argument', () => {
         try {
             new Reporter('name', 'NaN', noop);
         } 
@@ -129,7 +129,17 @@ describe('Reporter Instance', () => {
     });
 
     describe('behavior', () => {
-        it('throws an error when .taskDone() is called more then its ".totalTasks"', () => {
+        it('its `.done` prop increments by 1 for every .taskDone() call', () => {
+            const reporter = new Reporter(2, noop);
+            
+            expect(reporter.done).to.equal(0);
+            reporter.taskDone();
+            expect(reporter.done).to.equal(1);
+            reporter.taskDone();
+            expect(reporter.done).to.equal(2);
+        });
+
+        it('throws a RangeError when .taskDone() is called more then its `.totalTasks`', () => {
             const reporter = new Reporter(2, noop);
 
             reporter.taskDone();
@@ -142,122 +152,112 @@ describe('Reporter Instance', () => {
                 expect(err).to.be.a.RangeError;
             }
         });
-
-        describe('state changes', () => {
-            it('its "done" prop increments by 1 for every .taskDone() call', () => {
-                const reporter = new Reporter(2, noop);
-                
-                expect(reporter.done).to.be.equal(0);
-                reporter.taskDone();
-                expect(reporter.done).to.be.equal(1);
-                reporter.taskDone();
-                expect(reporter.done).to.be.equal(2);
-            });
-        });
         
-        describe('actions', () => {
-            it('runs its "callback" function when its "done" prop value reaches its "totalTasks" prop value', () => {
-                const callbackSpy = sinon.spy();
-                const reporter = new Reporter(2, callbackSpy);
+        it('runs its `.callback()` function when its `.done` prop value reaches its `.totalTasks` prop value', () => {
+            const callbackSpy = sinon.spy();
+            const reporter = new Reporter(2, callbackSpy);
+            
+            expect(reporter.totalTasks).to.equal(2);
 
-                reporter.taskDone();
-                expect(reporter.done).to.equal(1);
-                expect(callbackSpy.notCalled).to.be.true;
+            reporter.taskDone();
+            expect(reporter.done).to.equal(1);
+            expect(callbackSpy.notCalled).to.be.true;
 
-                reporter.taskDone();
-                expect(reporter.done).to.equal(2);
+            reporter.taskDone();
+            expect(reporter.done).to.equal(2);
+            expect(callbackSpy.calledOnce).to.be.true;
+        });
+
+        it('can creates sub-reporters', () => {
+            const mainReporter = new Reporter(2, noop);
+
+            const subReporter1 = mainReporter.subReporter('subName');
+            const subReporter2 = mainReporter.subReporter(2);
+
+            expect(subReporter1.name).to.equal('subName');
+            expect(subReporter2.name).to.equal('reporter_9');
+
+            expect(subReporter1.totalTasks).to.equal(1);
+            expect(subReporter2.totalTasks).to.equal(2);
+
+            expect(subReporter1 instanceof ReporterConstructor).to.be.true;
+            expect(subReporter2 instanceof ReporterConstructor).to.be.true;
+        });
+
+        it('its `.taskDone()` method is called by one of its completed sub-reporter', (done) => {
+            const callback = sinon.spy(() => {
+                expect(callback.calledOnce).to.be.true;
+                expect(taskDoneSpy.calledOnce).to.be.true;
+                done();
+            });
+
+            const mainReporter = new Reporter(1, callback);
+            
+            const taskDoneSpy = sinon.spy(mainReporter, 'taskDone');
+
+            const subReporter      = mainReporter.subReporter();
+            const grandSubReporter = subReporter.subReporter();
+
+            grandSubReporter.taskDone();
+        });
+
+        it('is done when all of its sub-reporters are done', (done) => {
+            function callback () {
+                expect(subReporter2.done).to.equal(2);
                 expect(callbackSpy.calledOnce).to.be.true;
-            });
+                done();
+            }
 
-            it('works for async tasks', (done) => {
-                function callback () {
-                    expect(callbackSpy.calledOnce).to.be.true;
-                    done();
-                }
+            const callbackSpy = sinon.spy(callback);
 
-                const callbackSpy = sinon.spy(callback);
+            const mainReporter = new Reporter(2, callbackSpy);
+            const subReporter1 = mainReporter.subReporter(1);
+            const subReporter2 = mainReporter.subReporter(2);
 
-                const reporter = new Reporter(2, callbackSpy);
+            setTimeout(() => {
+                subReporter1.taskDone();
+            }, 2);
 
+            const ary = ['a', 'b'];
+
+            ary.forEach(() => {
                 setTimeout(() => {
-                    reporter.taskDone();
+                    subReporter2.taskDone();
                 }, 2);
+            });
+        });  
 
-                setTimeout(() => {
-                    reporter.taskDone();
-                }, 1);
+        it('its `data` prop is shared between reporters and their sub-reporters for the user to use', () => {
+            const MY_VALUE_1 = 'myValue1';
+            const MY_VALUE_2 = 'myValue2';
+
+            const mainReporter = new Reporter(noop);
+            const subReporter  = mainReporter.subReporter();
+
+            mainReporter.data.myKey1 = MY_VALUE_1;
+            subReporter.data.myKey2  = MY_VALUE_2;
+
+            expect(mainReporter.data).to.deep.equal({
+                myKey1: MY_VALUE_1,
+                myKey2: MY_VALUE_2,
             });
 
-            it('can creates sub-reporters', () => {
-                const mainReporter = new Reporter(2, noop);
-                const subReporter1 = mainReporter.subReporter();
-                const subReporter2 = mainReporter.subReporter();
+            expect(mainReporter.data).to.deep.equal(subReporter.data);
+        });
 
-                expect(subReporter1.totalTasks).to.equal(1);
+        it('runs its callback with the data object as an argument', (done) => {
+            const dataObj = {key:'value'};
 
-                expect(subReporter1 instanceof ReporterConstructor).to.be.true;
-                expect(subReporter2 instanceof ReporterConstructor).to.be.true;
-            });
+            function callback (data) {
+                expect(callbackSpy.calledWith(data)).to.be.true;
+                done();
+            }
 
-            it('is done when all of its sub-reporters are done', (done) => {
-                function callback () {
-                    expect(subReporter2.done).to.equal(2);
-                    expect(callbackSpy.calledOnce).to.be.true;
-                    done();
-                }
+            const callbackSpy = sinon.spy(callback);
+            const mainReporter = new Reporter(callbackSpy);
 
-                const callbackSpy = sinon.spy(callback);
-
-                const mainReporter = new Reporter(2, callbackSpy);
-                const subReporter1 = mainReporter.subReporter(1);
-                const subReporter2 = mainReporter.subReporter(2);
-
-                setTimeout(() => {
-                    subReporter1.taskDone();
-                }, 2);
-
-                const ary = ['a', 'b'];
-
-                ary.forEach(() => {
-                    setTimeout(() => {
-                        subReporter2.taskDone();
-                    }, 2);
-                });
-            });
-
-            it('its "data" prop is shared between reporters and their sub-reporters for the user to use', () => {
-                const MY_VALUE_1 = 'myValue1';
-                const MY_VALUE_2 = 'myValue2';
-
-                const mainReporter = new Reporter(noop);
-                const subReporter  = mainReporter.subReporter();
-
-                mainReporter.data.myKey1 = MY_VALUE_1;
-                subReporter.data.myKey2  = MY_VALUE_2;
-
-                expect(mainReporter.data).to.deep.equal({
-                    myKey1: MY_VALUE_1,
-                    myKey2: MY_VALUE_2,
-                });
-
-                expect(mainReporter.data).to.deep.equal(subReporter.data);
-            });
-
-            it('run its callback with the data object as an argument', (done) => {
-                const dataObj = {key:'value'};
-
-                function callback (data) {
-                    expect(callbackSpy.calledWith(data)).to.be.true;
-                    done();
-                }
-
-                const callbackSpy = sinon.spy(callback);
-                const mainReporter = new Reporter(callbackSpy);
-
-                mainReporter.data = dataObj;
-                mainReporter.taskDone();
-            });
-
+            mainReporter.data = dataObj;
+            mainReporter.taskDone();
         });
     });
 });
