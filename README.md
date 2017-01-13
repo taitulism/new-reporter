@@ -5,30 +5,32 @@
 
 new-reporter
 ============
-A politically-incorrect alternative to orchestrate callback hell.
+A politically-incorrect alternative to orchestrate callback hell.  
+But hey! Its easier to debug!
 
 
 
 
 Usage
 -----
-###Basic:
 ```js
 const newReporter = require('new-reporter');
 
-const mainReporter = newReporter(reporterName, totalTasks, callback}); // "totalTasks" default is: 1
+const reporter = newReporter(reporterName, totalTasks, callback); // "totalTasks" default is: 1
 ```
 
-Params
-------
-* **reporterName** - String, optional. default = `'reporter_i'` ("i" is an incrementing number)  
+Arguments
+---------
+* **reporterName** - String, optional.  
+Default value = `'reporter_i'` ("i" is an incrementing number)  
 Give a reporter a name (e.g. `'main-reporter'`).  
 Good for debugging.
 
-* **totalTasks** - Number, optional. default = `1`  
+* **totalTasks** - Number, optional.  
+Default value = `1`  
 How many tasks should this reporter expects to be done before calling the `callback`?
 
-* **callback** - Function, must.  
+* **callback** - Function, required.  
 A function to run when all of the reporter's tasks reported done.  
 This function gets called with the reporter's `data` object.
 
@@ -39,10 +41,10 @@ API
 ---
 * **.taskDone()**  
 Call this method N times to make the reporter run its `callback` function, where "N" is the 
-reporter's`totalTasks`.
+reporter's `totalTasks`.
 This function gets no arguments.
 
-* **.subReporter(name, totalTasks)**
+* **.subReporter(name, totalTasks)**  
 Returns a sub-reporter that when it's done, will run the current reporter's `.taskDone()` method.  
 Use a sub-reporter when a task can be splitted into sub-tasks.  
 For example: Your main reporter is expecting 2 tasks to be done: one is a simple task but the second
@@ -87,7 +89,7 @@ const subReporter3 = mainReporter.subReporter(1);
 ***NOTE 1**: `totalTasks`'s default value is 1*   
 ***NOTE 2**: Creating a sub-reporter for only one job is a redundant overhead.* 
 
-A a sub-reporter doesn't need a callback because when it's done, it calls its parent's `.taskDone()` method:
+A a sub-reporter doesn't need a callback because when it's done it calls its parent's `.taskDone()` method:
 ```js
 const newReporter = require('new-reporter');
 
@@ -116,9 +118,9 @@ function callback (data) {
   console.log(data); // --> {myKey:'myValue'}
 }
 
-const mainReporter   = newReporter(1, callback});
-const subReporter    = mainReporter.subReporter(1);
-const grandSubReporter = subReporter.subReporter(1);
+const mainReporter     = newReporter(callback});
+const subReporter      = mainReporter.subReporter();
+const grandSubReporter = subReporter.subReporter();
 
 grandSubReporter.data.myKey = 'myValue';
 
