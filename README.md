@@ -16,7 +16,7 @@ Usage
 ```js
 const newReporter = require('new-reporter');
 
-const reporter = newReporter(reporterName, totalTasks, callback); // "totalTasks" default is: 1
+const reporter = newReporter(reporterName, totalTasks, callback);
 ```
 
 Arguments
@@ -37,12 +37,21 @@ This function gets called with the reporter's `data` object.
 
 
 
+Shared Property
+---------------
+**.data** - Each reporter starts with an empty `.data` object. This object is shared between reporters and their sub-reporters.
+
+
+
+
 API
 ---
-* **.taskDone()**  
+* **.taskDone(key, value)**  
 Call this method N times to make the reporter run its `callback` function, where "N" is the 
-reporter's `totalTasks`.
-This function gets no arguments.
+reporter's `totalTasks`.  
+The `key` & `value` are optional arguments. Passing them to `.taskDone()` will set them on the reporter's shared `data` object.
+  * **key** - String.
+  * **value** - Any type.
 
 * **.subReporter(name, totalTasks)**  
 Returns a sub-reporter that when it's done, will run the current reporter's `.taskDone()` method.  
@@ -142,8 +151,7 @@ function fetchData (mainReporter) {
   const requestUrl = mainReporter.data.url;
 
   ajax.get(requestUrl, (response) => { // made up async function
-    mainReporter.data.response = response;
-    mainReporter.taskDone();
+    mainReporter.taskDone('response', response);
   });
 }
 

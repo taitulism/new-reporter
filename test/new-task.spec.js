@@ -260,7 +260,7 @@ describe('Reporter Instance', () => {
             mainReporter.taskDone();
         });
 
-        it('its `.taskDone(key, value)` can set stuff on the shared data object ', (done) => {
+        it('its `.taskDone(key, value)` can set a key-value pair on the shared data object ', (done) => {
             function callback (data) {
                 expect(data).to.deep.equal({'myKey':'myValue'});
                 done();
@@ -271,6 +271,31 @@ describe('Reporter Instance', () => {
             const subReporter = mainReporter.subReporter();
 
             subReporter.taskDone('myKey', 'myValue');
+        });
+
+        it('its `.taskDone(key, value)` can spread an object on the shared data object ', (done) => {
+            const dataObj1 = {
+                key1:'value1',
+                key2:'value2'
+            };
+
+            const dataObj2 = {
+                key0:'value0',
+                key1:'value1',
+                key2:'value2'
+            };
+            
+            function callback (data) {
+                expect(data).to.deep.equal(dataObj2);
+                done();
+            }
+
+            const callbackSpy = sinon.spy(callback);
+            const mainReporter = newReporter(callbackSpy);
+            const subReporter = mainReporter.subReporter();
+
+            mainReporter.data.key0 = 'value0';
+            subReporter.taskDone(dataObj1);
         });
     });
 });
