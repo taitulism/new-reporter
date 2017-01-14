@@ -259,5 +259,18 @@ describe('Reporter Instance', () => {
             mainReporter.data = dataObj;
             mainReporter.taskDone();
         });
+
+        it('its `.taskDone(key, value)` can set stuff on the shared data object ', (done) => {
+            function callback (data) {
+                expect(data).to.deep.equal({'myKey':'myValue'});
+                done();
+            }
+
+            const callbackSpy = sinon.spy(callback);
+            const mainReporter = newReporter(callbackSpy);
+            const subReporter = mainReporter.subReporter();
+
+            subReporter.taskDone('myKey', 'myValue');
+        });
     });
 });
