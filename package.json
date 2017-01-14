@@ -15,7 +15,9 @@
     "async",
     "task",
     "subtask",
-    "sub task"
+    "sub task",
+    "callback",
+    "callback hell"
   ],
   "repository": {
     "type": "git",
