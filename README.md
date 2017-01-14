@@ -19,6 +19,11 @@ const newReporter = require('new-reporter');
 const reporter = newReporter(reporterName, totalTasks, callback);
 ```
 
+[See some real life use-cases](./docs/use-cases/simple.md)
+
+
+
+
 Params
 ------
 * **reporterName** - String, optional.  
@@ -138,71 +143,4 @@ mainReporter.data.myKey === 'myValue' // true
 grandSubReporter.taskDone();
 ```
 
-
-
-
-A "Real Life" Use Case
-----------------------
-The callback gets called after an ajax request and reading all files in a certain folder:
-```js
-const newReporter = require('new-reporter');
-
-function fetchData (mainReporter) {
-  const requestUrl = mainReporter.data.url;
-
-  ajax.get(requestUrl, (response) => { // made up async function
-    mainReporter.taskDone('response', response);
-  });
-}
-
-function getAllFilesContents (mainReporter) {
-  const folderPath = mainReporter.data.folder;
-  
-  getFilesList(folderPath, (files) => { // made up async function
-    const subReporter = mainReporter.subReporter(files.length);
-    
-    subReporter.data.contents = [];
-
-    files.forEach((file) => {
-      readFileContent(file, subReporter);
-    });
-  });
-}
-
-function readFileContent (file, subReporter) {
-  readFile(file, (content) => { // made up async function
-    subReporter.data.contents.push(content);
-    subReporter.taskDone();
-  });
-}
-
-function callback (data) {
-  console.log(data);
-}
-
-
-function getAllData () {
-    const mainReporter = newReporter(2, callback);
-
-    mainReporter.data = {
-        url: '/url',
-        folder: '/path/to/folder'
-    };
-
-    fetchData(mainReporter);           // 1
-    getAllFilesContents(mainReporter); // 2
-}
-
-getAllData();
-
-/*
-  callback's data: 
-  {
-    url: '/url',
-    folder: '/path/to/folder',
-    response: {...},
-    contents: [...]
-  }
-*/
-```
-
+[See some real life use-cases](./docs/use-cases/simple.md)

@@ -1,4 +1,5 @@
 .vscode
+docs
 playground
 node_modules
 npm-debug.log
