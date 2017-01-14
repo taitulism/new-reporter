@@ -19,8 +19,8 @@ const newReporter = require('new-reporter');
 const reporter = newReporter(reporterName, totalTasks, callback);
 ```
 
-Arguments
----------
+Params
+------
 * **reporterName** - String, optional.  
 Default value = `'reporter_i'` ("i" is an incrementing number)  
 Give a reporter a name (e.g. `'main-reporter'`).  
