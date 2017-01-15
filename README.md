@@ -32,7 +32,7 @@ Give a reporter a name (e.g. `'main-reporter'`).
 Good for debugging.
 
 * **totalTasks** - Number, optional.  
-Default value = `1`  
+Default value = `2`  
 How many tasks should this reporter expects to be done before calling the `callback`?
 
 * **callback** - Function, required.  
@@ -94,13 +94,12 @@ Sub-Reporter
 ------------
 A Reporter can have sub-reporters:
 ```js
-const mainReporter = newReporter(3, callback);
-const subReporter1 = mainReporter.subReporter(1); 
-const subReporter2 = mainReporter.subReporter(1);
-const subReporter3 = mainReporter.subReporter(1);
+const mainReporter = newReporter(callback);
+const subReporter1 = mainReporter.subReporter(2); 
+const subReporter2 = mainReporter.subReporter(); // also 2
 ```
 
-***NOTE 1**: `totalTasks`'s default value is 1*   
+***NOTE 1**: `totalTasks`'s default value is 2*   
 ***NOTE 2**: Creating a sub-reporter for only one job is a redundant overhead.* 
 
 A a sub-reporter doesn't need a callback because when it's done it calls its parent's `.taskDone()` method:
