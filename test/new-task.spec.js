@@ -106,6 +106,13 @@ describe('Reporter Instance', () => {
             });            
         });
 
+        describe('.tmpObj', () => {
+            it('is an empty object', () => {
+                expect(reporter.tmpObj).to.be.an.object;
+                expect(reporter.tmpObj).to.deep.equal({});
+            });            
+        });
+
         describe('.done', () => {
             it('is a number', () => {
                 expect(reporter.done).to.be.a.number;
@@ -243,6 +250,24 @@ describe('Reporter Instance', () => {
             });
 
             expect(mainReporter.data).to.deep.equal(subReporter.data);
+        });
+
+        it('its `tmpObj` prop is shared between reporters and their sub-reporters for the user to use', () => {
+            const MY_VALUE_1 = 'myValue1';
+            const MY_VALUE_2 = 'myValue2';
+
+            const mainReporter = newReporter(noop);
+            const subReporter  = mainReporter.subReporter();
+
+            mainReporter.tmpObj.myKey1 = MY_VALUE_1;
+            subReporter.tmpObj.myKey2  = MY_VALUE_2;
+
+            expect(mainReporter.tmpObj).to.deep.equal({
+                myKey1: MY_VALUE_1,
+                myKey2: MY_VALUE_2,
+            });
+
+            expect(mainReporter.tmpObj).to.deep.equal(subReporter.tmpObj);
         });
 
         it('runs its callback with the data object as an argument', (done) => {
