@@ -67,7 +67,7 @@ describe('Reporter Instance', () => {
     });
 
     describe('props', () => {
-        const reporter = newReporter(2, noop);
+        const reporter = newReporter(noop);
         
         describe('.name', () => {
             it('is an optional argument', () => {
@@ -85,8 +85,8 @@ describe('Reporter Instance', () => {
             it('an optional argument', () => {
                 expect(rootReporter.totalTasks).to.be.a.number;
             });
-            it('its default value is 1', () => {
-                expect(rootReporter.totalTasks).to.equal(1);
+            it('its default value is 2', () => {
+                expect(rootReporter.totalTasks).to.equal(2);
             });
         });
 
@@ -162,7 +162,7 @@ describe('Reporter Instance', () => {
         
         it('runs its `.callback()` function when its `.done` prop value reaches its `.totalTasks` prop value', () => {
             const callbackSpy = sinon.spy();
-            const reporter = newReporter(2, callbackSpy);
+            const reporter = newReporter(callbackSpy);
             
             expect(reporter.totalTasks).to.equal(2);
 
@@ -176,10 +176,10 @@ describe('Reporter Instance', () => {
         });
 
         it('can creates sub-reporters', () => {
-            const mainReporter = newReporter(2, noop);
+            const mainReporter = newReporter(noop);
 
-            const subReporter1 = mainReporter.subReporter('subName');
-            const subReporter2 = mainReporter.subReporter(2);
+            const subReporter1 = mainReporter.subReporter('subName', 1);
+            const subReporter2 = mainReporter.subReporter();
 
             expect(subReporter1.name).to.equal('subName');
             expect(subReporter2.name).to.equal('reporter_9');
@@ -202,8 +202,8 @@ describe('Reporter Instance', () => {
             
             const taskDoneSpy = sinon.spy(mainReporter, 'taskDone');
 
-            const subReporter      = mainReporter.subReporter();
-            const grandSubReporter = subReporter.subReporter();
+            const subReporter      = mainReporter.subReporter(1);
+            const grandSubReporter = subReporter.subReporter(1);
 
             grandSubReporter.taskDone();
         });
@@ -279,7 +279,7 @@ describe('Reporter Instance', () => {
             }
 
             const callbackSpy = sinon.spy(callback);
-            const mainReporter = newReporter(callbackSpy);
+            const mainReporter = newReporter(1, callbackSpy);
 
             mainReporter.data = dataObj;
             mainReporter.taskDone();
@@ -292,13 +292,13 @@ describe('Reporter Instance', () => {
             }
 
             const callbackSpy = sinon.spy(callback);
-            const mainReporter = newReporter(callbackSpy);
-            const subReporter = mainReporter.subReporter();
+            const mainReporter = newReporter(1, callbackSpy);
+            const subReporter = mainReporter.subReporter(1);
 
             subReporter.taskDone('myKey', 'myValue');
         });
 
-        it('its `.taskDone(key, value)` can spread an object on the shared data object ', (done) => {
+        it('its `.taskDone(obj)` can spread an object on the shared data object ', (done) => {
             const dataObj1 = {
                 key1:'value1',
                 key2:'value2'
@@ -316,8 +316,8 @@ describe('Reporter Instance', () => {
             }
 
             const callbackSpy = sinon.spy(callback);
-            const mainReporter = newReporter(callbackSpy);
-            const subReporter = mainReporter.subReporter();
+            const mainReporter = newReporter(1, callbackSpy);
+            const subReporter = mainReporter.subReporter(1);
 
             mainReporter.data.key0 = 'value0';
             subReporter.taskDone(dataObj1);
