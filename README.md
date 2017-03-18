@@ -6,8 +6,7 @@
 new-reporter
 ============
 A politically-incorrect alternative to orchestrate callback hell.  
-But hey! Its easier to debug!
-
+But hey! It's easier to debug!
 
 
 
@@ -16,77 +15,54 @@ Usage
 ```js
 const newReporter = require('new-reporter');
 
-const reporter = newReporter(reporterName, totalTasks, callback);
+function myCallback (data) {
+  console.log('all done');
+}
+
+const myReporter = newReporter(3, myCallback);
+
+// sometime later...
+myReporter.taskDone(); // 1
+// ...
+myReporter.taskDone(); // 2
+// ...
+myReporter.taskDone(); // 3 --> runs myCallback
 ```
-
-[See some real life use-cases](./docs/use-cases/simple.md)
-
+A reporter will run its callback function when it has been reported done as many times as its given limit.
 
 
 
 Params
 ------
+```js
+newReporter(reporterName, totalTasks, callback);
+```
+
 * **reporterName** - String, optional.  
-Default value = `'reporter_i'` ("i" is an incrementing number)  
+Default value = `'reporter_[i]'` ("i" is an incrementing number, without the square brackets)  
 Give a reporter a name (e.g. `'main-reporter'`).  
 Good for debugging.
 
 * **totalTasks** - Number, optional.  
 Default value = `2`  
-How many tasks should this reporter expects to be done before calling the `callback`?
+The number of tasks to complete before calling the `callback`.
 
 * **callback** - Function, required.  
 A function to run when all of the reporter's tasks reported done.  
-This function gets called with the reporter's `data` object.
+This function gets called with the reporter's shared `data` object.
 
 
 
-
-Shared Property
----------------
-**.data** - Each reporter starts with an empty `.data` object. This object is shared between reporters and their sub-reporters.
-
-
-
-
-API
----
-* **.taskDone(key, value)**  
-Call this method N times to make the reporter run its `callback` function, where "N" is the 
-reporter's `totalTasks`.  
+Reporter Instance API
+---------------------
+* **taskDone(key, value)**  
+Call this method N times to make the reporter run its `callback` function, where "N" is the reporter's given `totalTasks` param.  
 The `key` & `value` are optional arguments. Passing them to `.taskDone()` will set them on the reporter's shared `data` object.
   * **key** - String.
   * **value** - Any type.
 
-* **.subReporter(name, totalTasks)**  
-Returns a sub-reporter that when it's done, will run the current reporter's `.taskDone()` method.  
-Use a sub-reporter when a task can be splitted into sub-tasks.  
-For example: Your main reporter is expecting 2 tasks to be done: one is a simple task but the second
-needs to do two things (two sub-tasks). In this case, create a sub-reporter for the second task. Call `mainReporter.taskDone()` 
-when the simple task is done, and call `subReporter.taskDone()` twice, one for each of the second task's
-sub-tasks.
-
-
-
-
-Examples
---------
-A reporter will run its callback function when it has been reported done with `.taskDone()` as many times as 
-its given limit (`totalTasks`):
-```js
-const newReporter = require('new-reporter');
-
-function callback (data) {
-  console.log('all done');
-}
-
-const mainReporter = newReporter(3, callback});
-
-mainReporter.taskDone(); // 1
-mainReporter.taskDone(); // 2
-mainReporter.taskDone(); // 3 --> runs callback
-```
-
+* **subReporter(reporterName, totalTasks)**  
+Creates a sub-reporter. Use a sub-reporter when a task can be splitted into sub-tasks.  
 
 
 
@@ -94,52 +70,80 @@ Sub-Reporter
 ------------
 A Reporter can have sub-reporters:
 ```js
-const mainReporter = newReporter(callback);
-const subReporter1 = mainReporter.subReporter(2); 
-const subReporter2 = mainReporter.subReporter(); // also 2
+const parentReporter = newReporter(callback);
+const childReporter1 = parentReporter.subReporter(2); 
+const childReporter2 = parentReporter.subReporter( ); // also 2
 ```
 
-***NOTE 1**: `totalTasks`'s default value is 2*   
-***NOTE 2**: Creating a sub-reporter for only one job is a redundant overhead.* 
+>**NOTE**: *`totalTasks` default value is `2`*   
 
-A a sub-reporter doesn't need a callback because when it's done it calls its parent's `.taskDone()` method:
+A sub-reporter doesn't need a callback because when it's done it calls its parent's `.taskDone()` method:
+
 ```js
 const newReporter = require('new-reporter');
 
-function callback (data) {
+function callback () {
   console.log('all done');
 }
 
-const mainReporter = newReporter(callback);
-const subReporter = mainReporter.subReporter();
-const grandSubReporter = subReporter.subReporter();
+const grandReporter  = newReporter(callback);
+const parentReporter = grandReporter.subReporter(1);
+const childReporter  = parentReporter.subReporter(1);
 
-grandSubReporter.taskDone(); // calls subReporter.taskDone() and eventually mainReporter.taskDone()
+childReporter.taskDone();
+// this will call parentReporter.taskDone() and then grandReporter.taskDone()
 ```
 
+>**NOTE**: *Creating a sub-reporter for only one job is a redundant overhead.* 
+
+**When to use sub-reporters?**  
+When your async task can be split into sub-tasks.
+
+A use case: Your main reporter is expecting 2 tasks to be done: one is a simple task but the second needs to do two things. In this case, create a sub-reporter for the second task. Call `mainReporter.taskDone()` when the simple task is done, and call `subReporter.taskDone()` twice, one for each of the second task's sub-tasks.
+
+[See some real life use-cases](./docs/use-cases/getFolderTotalSize.md)
 
 
 
-Reporter.data
--------------
-The `data` prop is shared between a reporter and all of its sub-reporters and their sub-reporters.  
-It starts as an empty object so you could load it with your own props:
+Shared Data
+-----------
+Each reporter starts with a `data` property which is an empty object:
+
+```js
+const newReporter = require('new-reporter');
+
+const reporter = newReporter();
+
+console.log(reporter.data) // {}
+
+```
+
+This object is shared between reporters and their sub-reporters and passed to the callback function when all tasks are done.  
+
+Use it to pass your own props:
+
 ```js
 const newReporter = require('new-reporter');
 
 function callback (data) {
-  console.log(data); // --> {myKey:'myValue'}
+  console.log('log:', data);
 }
 
-const mainReporter     = newReporter(callback});
-const subReporter      = mainReporter.subReporter();
-const grandSubReporter = subReporter.subReporter();
+const grandReporter  = newReporter(callback);
+const parentReporter = grandReporter.subReporter(1);
+const childReporter  = parentReporter.subReporter(1);
 
-grandSubReporter.data.myKey = 'myValue';
+grandReporter.data.myKey = 'myValue';
 
-mainReporter.data.myKey === 'myValue' // true
+parentReporter.data.myKey === 'myValue' // true
 
-grandSubReporter.taskDone();
+// you could also do: 
+childReporter.taskDone('myKey', 'myValue');
+
+/*
+  log: {myKey:'myValue'}
+*/
 ```
 
-[See some real life use-cases](./docs/use-cases/simple.md)
+
+*REMEMBER: By using `new-reporter` you choose data sharing over repeatative argument passing. You only take what you need.*
