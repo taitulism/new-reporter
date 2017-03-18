@@ -52,13 +52,6 @@ describe('props', () => {
         });            
     });
 
-    describe('.tmpObj', () => {
-        it('is an empty object', () => {
-            expect(reporter.tmpObj).to.be.an.object;
-            expect(reporter.tmpObj).to.deep.equal({});
-        });            
-    });
-
     describe('.done', () => {
         it('is a number', () => {
             expect(reporter.done).to.be.a.number;
