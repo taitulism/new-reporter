@@ -10,130 +10,12 @@ function noop () {}
 const rootReporter = newReporter(noop);
 const ReporterConstructor = rootReporter.constructor;
 
-describe('new-reporter class', () => {
-    it('is a function', () => {
-        expect(newReporter).to.be.a.function;
-    });
-
-    it('throws a ReferenceError when invoked with no arguments', () => {
-        try {
-            newReporter();
-        } 
-        catch (err) {
-            expect(err).to.be.a.ReferenceError;
-        }
-    });
-
-    it('throws a TypeError when invoked with a non-function `callback` argument', () => {
-        try {
-            newReporter('name');
-        } 
-        catch (err) {
-            expect(err).to.be.a.TypeError;
-        }
-        
-        try {
-            newReporter('name', 2);
-        } 
-        catch (err) {
-            expect(err).to.be.a.TypeError;
-        }
-        
-        try {
-            newReporter('name', 2, 'not a function');
-        } 
-        catch (err) {
-            expect(err).to.be.a.TypeError;
-        }
-    });
-
-    it('throws a TypeError when invoked with a NaN `totalTasks` argument', () => {
-        try {
-            newReporter('name', 'NaN', noop);
-        } 
-        catch (err) {
-            expect(err).to.be.a.TypeError;
-        }
-    });
-
-    it('returns a Reporter instance', () => {
-        expect((newReporter(noop)) instanceof ReporterConstructor).to.be.true;
-    });
-});
-
 describe('Reporter Instance', () => {
     it('is an instance of Reporter constructor', () => {
         expect(rootReporter instanceof ReporterConstructor).to.be.true;
     });
 
-    describe('props', () => {
-        const reporter = newReporter(noop);
-        
-        describe('.name', () => {
-            it('is an optional argument', () => {
-                expect(reporter.name).to.equal('reporter_1');
-            });
-            it('is a string', () => {
-                expect(reporter.name).to.be.a.string;
-            });
-        });
-        
-        describe('.totalTasks', () => {
-            it('is a number', () => {
-                expect(reporter.totalTasks).to.be.a.number;
-            });
-            it('an optional argument', () => {
-                expect(rootReporter.totalTasks).to.be.a.number;
-            });
-            it('its default value is 2', () => {
-                expect(rootReporter.totalTasks).to.equal(2);
-            });
-        });
-
-        describe('.callback', () => {
-            it('is a function', () => {
-                expect(reporter.callback).to.be.a.function;
-            });
-            it('passed as an argument', () => {
-                expect(reporter.callback).to.equal(noop);
-            });
-        });
-
-        describe('.data', () => {
-            it('is an empty object', () => {
-                expect(reporter.data).to.be.an.object;
-                expect(reporter.data).to.deep.equal({});
-            });            
-        });
-
-        describe('.tmpObj', () => {
-            it('is an empty object', () => {
-                expect(reporter.tmpObj).to.be.an.object;
-                expect(reporter.tmpObj).to.deep.equal({});
-            });            
-        });
-
-        describe('.done', () => {
-            it('is a number', () => {
-                expect(reporter.done).to.be.a.number;
-            });
-            it('starts at 0', () => {
-                expect(reporter.done).to.equal(0);
-            });
-        });
-    });
-
-    describe('methods', () => {
-        const reporter = newReporter(2, noop);
-
-        it('.taskDone()', () => {
-            expect(reporter.taskDone).to.be.a.function;
-        });
-
-        it('.subReporter()', () => {
-            expect(reporter.subReporter).to.be.a.function;
-        });            
-    });
+    require('./props-and-methods');
 
     describe('behavior', () => {
         it('its `.done` prop increments by 1 for every .taskDone() call', () => {
@@ -160,7 +42,7 @@ describe('Reporter Instance', () => {
             }
         });
         
-        it('runs its `.callback()` function when its `.done` prop value reaches its `.totalTasks` prop value', () => {
+        it('runs its callback function when `done` prop value reaches `totalTasks` prop value', () => {
             const callbackSpy = sinon.spy();
             const reporter = newReporter(callbackSpy);
             
@@ -182,7 +64,7 @@ describe('Reporter Instance', () => {
             const subReporter2 = mainReporter.subReporter();
 
             expect(subReporter1.name).to.equal('subName');
-            expect(subReporter2.name).to.equal('reporter_9');
+            expect(subReporter2.name).to.equal('reporter_11');
 
             expect(subReporter1.totalTasks).to.equal(1);
             expect(subReporter2.totalTasks).to.equal(2);
