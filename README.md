@@ -49,20 +49,23 @@ The number of tasks to complete before calling the `callback`.
 
 * **callback** - Function, required.  
 A function to run when all of the reporter's tasks reported done.  
-This function gets called with the reporter's shared `data` object.
+This function follows Node's known ["Error-First"](#http://fredkschott.com/post/2014/03/understanding-error-first-callbacks-in-node-js/) callback convention: it gets called with two arguments: `(error, data)`. If everything is ok then `error=null` and data is a data object.
 
 
 
-Reporter Instance API
----------------------
+Reporter API
+------------
 * **taskDone(key, value)**  
 Call this method N times to make the reporter run its `callback` function, where "N" is the reporter's given `totalTasks` param.  
 The `key` & `value` are optional arguments. Passing them to `.taskDone()` will set them on the reporter's shared `data` object.
   * **key** - String.
   * **value** - Any type.
 
+* **taskFail(error)**  
+Calls the reporter's callback function with `error` as its first argument and `null` as its second argument (`data=null`).
+
 * **subReporter(reporterName, totalTasks)**  
-Creates a sub-reporter. Use a sub-reporter when a task can be splitted into sub-tasks.  
+Creates a sub-reporter. Use a sub-reporter when a task can be splitted into sub-tasks.
 
 
 
@@ -147,3 +150,27 @@ childReporter.taskDone('myKey', 'myValue');
 
 
 *REMEMBER: By using `new-reporter` you choose data sharing over repeatative argument passing. You only take what you need.*
+
+
+
+.taskFail(err)
+--------------
+Use this method to call the callback function immediately with an error:
+```js
+const fs = require('fs');
+
+const reporter = require('new-reporter');
+
+const fileReporter = reporter(callback);
+
+fs.readFile('NON/EXIST/FILE.ext', (err, content) => {
+  if (err) {
+    fileReporter.taskFail(err);
+  }
+  else {
+    fileReporter.taskDone('fileContent', content);
+  }
+});
+
+// ...
+```

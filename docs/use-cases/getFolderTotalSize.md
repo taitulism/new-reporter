@@ -71,12 +71,14 @@ function getFolderTotalSize (folderPath, callback) {
     let totalSize = 0;
 
     fs.readdir(folderPath, (err, files) => {
+        // always handle errors
+
         /* 
             we need the to pass:
-                * `files`      - to iterate over,
-                * `folderPath` - to resolve each file path with,
-                * `totalSize`  - to update
-                * `callback`   - to run when we're done.
+              * `files`      - to iterate over,
+              * `folderPath` - to resolve each file path with,
+              * `totalSize`  - to update
+              * `callback`   - to run when we're done.
         */
         sumUpAllFilesSize(files, folderPath, totalSize, callback);
     });
@@ -94,6 +96,8 @@ function sumUpAllFilesSize (files, folderPath, totalSize, callback) {
 
 function forEachFile (filePath, totalSize, countDown) {
     fs.stat(filePath, (err, stat) => {
+        // always handle errors
+
         totalSize += stat.size;
 
         countDown--;
@@ -152,7 +156,10 @@ function sumUpAllFilesSize (files, reporter) {
 
 function forEachFile (filePath, reporter) {
     fs.stat(filePath, (err, stat) => {
-        // always handle errors
+        if (err) {
+            reporter.taskFail(err);
+            return;
+        }
 
         reporter.data.totalSize += stat.size;
         reporter.taskDone();
@@ -179,7 +186,9 @@ data.folderPath = folderPath;
 
 Now you can call your `getFolderTotalSize` like:
 ```js
-getFolderTotalSize('path/to/folder', (data) => {
+getFolderTotalSize('path/to/folder', (err, data) => {
+    // always handle errors
+
     console.log(data.totalSize);
 });
 ```

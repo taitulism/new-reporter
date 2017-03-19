@@ -66,10 +66,14 @@ describe('methods', () => {
     const reporter = newReporter(2, noop);
 
     it('.taskDone()', () => {
-        expect(reporter.taskDone).to.be.a.function;
+        expect(reporter.taskDone).to.be.a('function');
+    });
+
+    it('.taskFail()', () => {
+        expect(reporter.taskFail).to.be.a('function');
     });
 
     it('.subReporter()', () => {
-        expect(reporter.subReporter).to.be.a.function;
+        expect(reporter.subReporter).to.be.a('function');
     });            
 });

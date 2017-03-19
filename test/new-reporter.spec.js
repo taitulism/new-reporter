@@ -137,8 +137,8 @@ describe('Reporter Instance', () => {
         it('runs its callback with the data object as an argument', (done) => {
             const dataObj = {key:'value'};
 
-            function callback (data) {
-                expect(callbackSpy.calledWith(data)).to.be.true;
+            function callback (err, data) {
+                expect(callbackSpy.calledWith(null, data)).to.be.true;
                 done();
             }
 
@@ -150,7 +150,8 @@ describe('Reporter Instance', () => {
         });
 
         it('its `.taskDone(key, value)` can set a key-value pair on the shared data object ', (done) => {
-            function callback (data) {
+            function callback (err, data) {
+                expect(err).to.be.null;
                 expect(data).to.deep.equal({'myKey':'myValue'});
                 done();
             }
@@ -174,7 +175,8 @@ describe('Reporter Instance', () => {
                 key2:'value2'
             };
             
-            function callback (data) {
+            function callback (err, data) {
+                expect(err).to.be.null;
                 expect(data).to.deep.equal(dataObj2);
                 done();
             }
@@ -185,6 +187,24 @@ describe('Reporter Instance', () => {
 
             mainReporter.data.key0 = 'value0';
             subReporter.taskDone(dataObj1);
+        });
+
+        it('its `.taskFail(err)` method calls the callback with an error immediately', (done) => {
+            function callback (err, data) {
+                expect(callbackSpy.calledOnce).to.be.true;
+                expect(err).not.to.be.null;
+                expect(data).to.be.null;
+            }
+
+            const callbackSpy = sinon.spy(callback);
+            const reporter = newReporter(2, callbackSpy);
+            const error = new Error('an error');
+
+            reporter.taskFail(error);
+            reporter.taskDone();
+            reporter.taskDone();
+            
+            done();
         });
     });
 });
