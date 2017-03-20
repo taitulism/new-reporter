@@ -36,7 +36,7 @@ describe('Reporter Instance', () => {
                 reporter.taskDone();
             }
             catch (err) {
-                expect(err).to.be.a.RangeError;
+                expect(err).to.be.an('error');
             }
         });
         
