@@ -1,7 +1,5 @@
-'use strict';
-
-const sinon   = require('sinon');
-const expect  = require('chai').expect;
+const sinon  = require('sinon');
+const expect = require('chai').expect;
 
 const newReporter = require('../');
 
@@ -12,7 +10,7 @@ const ReporterConstructor = rootReporter.constructor;
 
 describe('new-reporter class', () => {
     it('is a function', () => {
-        expect(newReporter).to.be.a.function;
+        expect(newReporter).to.be.a('function');
     });
 
     it('throws a ReferenceError when invoked with no arguments', () => {
@@ -20,7 +18,7 @@ describe('new-reporter class', () => {
             newReporter();
         } 
         catch (err) {
-            expect(err).to.be.a.ReferenceError;
+            expect(err).to.be.an('error');
         }
     });
 
@@ -29,21 +27,21 @@ describe('new-reporter class', () => {
             newReporter('name');
         } 
         catch (err) {
-            expect(err).to.be.a.TypeError;
+            expect(err).to.be.an('error');
         }
         
         try {
             newReporter('name', 2);
         } 
         catch (err) {
-            expect(err).to.be.a.TypeError;
+            expect(err).to.be.an('error');
         }
         
         try {
             newReporter('name', 2, 'not a function');
         } 
         catch (err) {
-            expect(err).to.be.a.TypeError;
+            expect(err).to.be.an('error');
         }
     });
 
@@ -52,7 +50,7 @@ describe('new-reporter class', () => {
             newReporter('name', 'NaN', noop);
         } 
         catch (err) {
-            expect(err).to.be.a.TypeError;
+            expect(err).to.be.an('error');
         }
     });
 

@@ -1,5 +1,5 @@
-const sinon   = require('sinon');
-const expect  = require('chai').expect;
+const sinon  = require('sinon');
+const expect = require('chai').expect;
 
 const newReporter = require('../');
 
@@ -17,17 +17,17 @@ describe('props', () => {
         });
 
         it('is a string', () => {
-            expect(reporter.name).to.be.a.string;
+            expect(reporter.name).to.be.a('string');
         });
     });
     
     describe('.totalTasks', () => {
         it('is a number', () => {
-            expect(reporter.totalTasks).to.be.a.number;
+            expect(reporter.totalTasks).to.be.a('number');
         });
 
         it('an optional argument', () => {
-            expect(rootReporter.totalTasks).to.be.a.number;
+            expect(rootReporter.totalTasks).to.be.a('number');
         });
 
         it('its default value is 2', () => {
@@ -37,7 +37,7 @@ describe('props', () => {
 
     describe('.callback', () => {
         it('is a function', () => {
-            expect(reporter.callback).to.be.a.function;
+            expect(reporter.callback).to.be.a('function');
         });
 
         it('passed as an argument', () => {
@@ -47,14 +47,14 @@ describe('props', () => {
 
     describe('.data', () => {
         it('is an empty object', () => {
-            expect(reporter.data).to.be.an.object;
+            expect(reporter.data).to.be.an('object');
             expect(reporter.data).to.deep.equal({});
         });            
     });
 
     describe('.done', () => {
         it('is a number', () => {
-            expect(reporter.done).to.be.a.number;
+            expect(reporter.done).to.be.a('number');
         });
         it('starts at 0', () => {
             expect(reporter.done).to.equal(0);

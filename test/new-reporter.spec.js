@@ -1,7 +1,5 @@
-'use strict';
-
-const sinon   = require('sinon');
-const expect  = require('chai').expect;
+const sinon  = require('sinon');
+const expect = require('chai').expect;
 
 const newReporter = require('../');
 
