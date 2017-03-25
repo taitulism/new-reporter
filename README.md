@@ -1,13 +1,13 @@
 
-**DEPRECATED**
-**DEPRECATED**
+**DEPRECATED**  
+**DEPRECATED**  
 **DEPRECATED**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/taitulism/newTask.svg?branch=develop)](https://travis-ci.org/taitulism/newTask)
 
-new-reporter
-============
+new-reporter - DEPRECATED
+=========================
 A politically-incorrect alternative to orchestrate callback hell.  
 But hey! It's easier to debug!
 
