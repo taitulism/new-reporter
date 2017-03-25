@@ -1,4 +1,7 @@
-(A work in progress...)
+
+**DEPRECATED**
+**DEPRECATED**
+**DEPRECATED**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/taitulism/newTask.svg?branch=develop)](https://travis-ci.org/taitulism/newTask)
