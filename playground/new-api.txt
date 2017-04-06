@@ -1,0 +1,123 @@
+run 1. a & b
+    2. c
+    3. end
+
+newFlow()
+    .run(a, b)
+    .then(c)
+    .done(end)
+
+
+
+
+run 1. a & (b1 > b2)
+    2. end
+
+newFlow()
+    .run(a)
+    .and(b1)
+        .then(b2)
+    .done(end)
+
+
+
+
+run 1. a
+    2. b & c
+    3. end
+
+newFlow()
+    .run(a)
+    .then(b, c)
+    .done(end)
+
+
+
+
+
+run 1. a
+    2. b
+    3. c1 & c2
+
+newFlow()
+    .run(a)
+    .then(b)
+    .then(c1, c2)
+    .done(end)
+
+
+
+
+run 1. a
+    2. b & (c1 > c2)
+    3. d
+
+newFlow()
+    .run(a)
+        .then(b)
+        .and(c1)
+            .then(c2)
+    .then(d)
+    .done(end)
+
+
+c = newFlow.run(c1).then(c2)
+
+newFlow()
+    .run(a)
+    .then(b, c)
+    .then(d)
+    .done(end)
+
+newFlow()
+    .run(statFolder)
+    .then( readDir, statFile.then(readContent) )
+    .then(d)
+    .done(end)
+
+newFlow()
+    .run(statFolder)
+    .then(readDir)
+    .then(each(statFile))
+    .done(end)
+
+run 1. (a > b) & c1 > c2 > d
+
+newFlow()
+    .run(a)
+        .then(b)
+    .and(c1)
+        .then(c2)
+        .then(d)
+    .done(end)
+
+
+
+
+run 1. a > b, c > d
+
+newFlow()
+    .run(a)
+        .then(b)
+    .and(c)
+        .then(d)
+    .done(end)
+
+
+run 1. a > (b1 & b2) > c
+
+newFlow()
+    .run(a)
+    .then(b1, b2)
+    .then(c)
+    .done(end)
+
+
+run 1. a > (foreach x b1) > c
+
+newFlow()
+    .run(a)
+        .then().forEach()
+
+    .then(c)
+    .done(end)
