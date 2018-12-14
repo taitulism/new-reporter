@@ -54,10 +54,32 @@ run 1. a
 
 newFlow()
     .run(a)
-        .then(b)
-        .and(c1)
-            .then(c2)
+    .then(b)
+        .and(newFlow().run(c1).then(c2))
     .then(d)
+    .done(end)
+
+run 1. a
+    2. b & (c1 > c2)
+    3. d & [e1, e2, e3]       <-- forEach parallel/serial
+    4. f & (g1 & g2) > g3
+
+newFlow()
+    .run(a)
+    .then(b)
+        .and(flow().run(c1).then(c2))
+    .then(d)
+        .and(flow([e1, e2, e3]).parallel((task, item, index)=>{
+            doSomething(item, (err, data)=>{
+                if (err) return task.error(err)
+
+                this.data.parsedItems.push(data);
+
+                task.done(serialPassData);
+            })
+        }))
+    .then(f)
+        .and(flow().run(g1, g2).then(g3))
     .done(end)
 
 
